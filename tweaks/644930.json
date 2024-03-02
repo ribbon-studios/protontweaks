@@ -1,0 +1,6 @@
+{
+  "name": "They Are Billions",
+  "tweaks": {
+    "dlls": ["gdiplus"]
+  }
+}
