@@ -12,8 +12,8 @@ pub mod utils;
 
 static VERSION_LONG: &str = concat!(
     env!("CARGO_PKG_VERSION"),
-    "@",
-    env!("GIT_SHORT_HASH"),
+    // "@",
+    // env!("GIT_SHORT_HASH"),
     " (",
     env!("COMPILE_TIME"),
     ")"
