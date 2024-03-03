@@ -19,11 +19,12 @@ pub fn command(app_id: Option<String>) -> Result<(), String> {
         apps
     };
 
+    let tweaks_list = tweaks::list();
+
     let tweaked_apps = apps
         .iter()
+        .filter(|app| tweaks_list.tweaks.contains(app))
         .map(|app_id| tweaks::get(&app_id))
-        .filter(|app| app.is_some())
-        .map(|app| app.unwrap())
         .collect::<Vec<App>>();
 
     let (mut tweaks_applied, mut total_tweaks) = (0, 0);

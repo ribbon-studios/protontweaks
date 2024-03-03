@@ -19,30 +19,48 @@ pub struct Tweaks {
     pub fonts: Option<Vec<String>>,
 }
 
-pub fn get_app_url(app_id: &str) -> Url {
-    let url = Url::parse(PROTONTWEAKS_DB).unwrap();
-
-    return url.join(&format!("{app_id}.json")).unwrap();
+#[derive(Debug, Deserialize)]
+pub struct TweaksList {
+    pub sha: String,
+    pub short_sha: String,
+    pub tweaks: Vec<String>,
 }
 
-pub fn get(app_id: &str) -> Option<App> {
-    let url = get_app_url(app_id);
+pub fn url(path: &str) -> Url {
+    let url = Url::parse(PROTONTWEAKS_DB).unwrap();
 
-    debug!("Requesting file from '{url}'...");
+    return url.join(&format!("{path}.json")).unwrap();
+}
 
-    let Ok(response) = reqwest::blocking::get(url) else {
-        return None;
-    };
+pub fn list() -> TweaksList {
+    let url = url("tweaks");
+
+    debug!("Requesting tweaks from '{url}'...");
+
+    let response = reqwest::blocking::get(url).unwrap();
 
     trace!("Response received!");
 
-    let Ok(mut app) = response.json::<App>() else {
-        return None;
-    };
+    response.json::<TweaksList>().unwrap()
+}
+
+pub fn get(app_id: &str) -> App {
+    let url = url(app_id);
+
+    debug!("Requesting file from '{url}'...");
+
+    let response =
+        reqwest::blocking::get(url).expect(&format!("Failed to get tweaks for {}", app_id));
+
+    trace!("Response received!");
+
+    let mut app = response
+        .json::<App>()
+        .expect(&format!("Failed to parse tweak data for {}", app_id));
 
     app.id = app_id.to_string();
 
-    Some(app)
+    app
 }
 
 pub fn apply(app: &App) -> Result<(u32, u32), String> {
