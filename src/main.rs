@@ -76,7 +76,7 @@ fn main() {
     let args = Cli::parse();
 
     let result = match args.command {
-        _ => commands::default::command(),
+        _ => commands::default::command(args.app_id),
     };
 
     if result.is_err() {

@@ -5,21 +5,26 @@ use crate::{
     utils::protontricks,
 };
 
-pub fn command() -> Result<(), String> {
+pub fn command(app_id: Option<String>) -> Result<(), String> {
     println!("Automatically applying necessary tweaks...");
 
-    let apps = protontricks::list::apps()?;
+    let apps = if let Some(app_id) = app_id {
+        vec![app_id]
+    } else {
+        let apps = protontricks::list::apps()?;
+        println!(
+            "Discovered {} from steam...",
+            format!("{} apps", apps.len()).bold()
+        );
+        apps
+    };
+
     let tweaked_apps = apps
         .iter()
         .map(|app_id| tweaks::get(&app_id))
         .filter(|app| app.is_some())
         .map(|app| app.unwrap())
         .collect::<Vec<App>>();
-
-    println!(
-        "Discovered {} from steam...",
-        format!("{} apps", tweaked_apps.len()).bold()
-    );
 
     let (mut tweaks_applied, mut total_tweaks) = (0, 0);
 
@@ -31,8 +36,9 @@ pub fn command() -> Result<(), String> {
 
     if tweaks_applied == 0 {
         println!(
-            "No tweaks were necessary! {}",
-            format!("({total_tweaks} tweaks attempted)").bold()
+            "{} {}",
+            "No tweaks were necessary!".green().bold(),
+            format!("({total_tweaks} tweaks attempted)").italic()
         );
     } else {
         println!(

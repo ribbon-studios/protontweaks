@@ -12,6 +12,18 @@
 ### Usage
 
 ```sh
-# One time run, checks all steam games and validates them
+# Applies tweaks to all apps
 protontweaks
+# Applies tweaks to one app
+protontweaks <app-id>
 ```
+
+### TODO
+
+- **Convenience**
+  - Add the ability to install a watch service that will detect games being installed to steam
+- **Performance**
+  - Apply tweaks async so multiple games can be tweaked at once
+  - Tweak DB Caching
+- **Tweak DB**
+  - Split into its own repository
