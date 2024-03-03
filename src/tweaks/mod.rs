@@ -15,8 +15,9 @@ pub struct App {
 
 #[derive(Debug, Deserialize)]
 pub struct Tweaks {
-    pub dlls: Option<Vec<String>>,
-    pub fonts: Option<Vec<String>>,
+    pub dlls: Vec<String>,
+    pub fonts: Vec<String>,
+    pub settings: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -67,15 +68,14 @@ pub fn apply(app: &App) -> Result<(u32, u32), String> {
     trace!("App ID: {}; Name: {}", app.id, app.name);
     let mut components: Vec<String> = vec![];
 
-    if let Some(dlls) = &app.tweaks.dlls {
-        trace!("DLLs: {}", dlls.len());
-        components.append(&mut dlls.clone());
-    }
+    trace!("DLLs: {}", app.tweaks.dlls.len());
+    components.append(&mut app.tweaks.dlls.clone());
 
-    if let Some(fonts) = &app.tweaks.fonts {
-        trace!("Fonts: {}", fonts.len());
-        components.append(&mut fonts.clone());
-    }
+    trace!("Fonts: {}", app.tweaks.fonts.len());
+    components.append(&mut app.tweaks.fonts.clone());
+
+    trace!("Settings: {}", app.tweaks.settings.len());
+    components.append(&mut app.tweaks.settings.clone());
 
     if components.len() == 0 {
         warn!("No components were found for {} -> {}", app.id, app.name);
