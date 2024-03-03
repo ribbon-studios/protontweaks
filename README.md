@@ -10,6 +10,57 @@
 - `protontricks` or `nix-shell`
   - If `nix-shell` is installed then we'll utilize it to temporarily install `protontricks`!
 
+### Installation
+
+We provide a [binary and deb package](https://github.com/rain-cafe/protontweaks/releases/latest) for installation on platforms that don't have nix.
+
+<details>
+  <summary>NixOS Flake Example</summary>
+
+```nix
+{
+  description = "NixOS Example";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    protontweaks.url = "github:rain-cafe/protontweaks/main";
+    protontweaks.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, nixpkgs, ... } @ inputs: {
+    nixosConfigurations =
+      let
+        inherit (self) outputs;
+        inherit (nixpkgs.lib) nixosSystem;
+      in
+      {
+        your-hostname = nixosSystem {
+          specialArgs = { inherit inputs outputs; };
+
+          modules = [
+            # This is just an example, you can obviously format this however you want!
+            ({ pkgs, ... }: {
+              nixpkgs = {
+                overlays = [
+                  inputs.protontweaks.overlay
+                ];
+              };
+
+              environment.systemPackages = with pkgs; [
+                protontweaks
+              ];
+            })
+            # Your NixOS Modules here...
+            ../defaults/configuration.nix
+          ];
+        };
+      };
+  };
+}
+```
+
+</details>
+
 ### Usage
 
 ```sh
