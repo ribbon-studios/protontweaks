@@ -9,6 +9,10 @@
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
     in
     {
+      overlay = final: prev: {
+        protontweaks = prev.callPackage ./nix/protontweaks.nix { };
+      };
+
       packages = forAllSystems (system:
         let
           pkgs = legacyPackages.${system};
