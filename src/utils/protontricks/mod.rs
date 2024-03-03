@@ -10,17 +10,19 @@ where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
 {
-    if !is_installed() {
-        if !nix_shell::is_installed() {
-            return Err("Please install 'nix-shell' or 'protontricks'!".to_string());
-        }
+    if is_installed() {
+        return super::command::exec("protontricks", args);
     }
 
-    super::command::exec("protontricks", args)
+    if nix_shell::is_installed() {
+        return nix_shell::run("protontricks", args);
+    }
+
+    return Err("Please install 'nix-shell' or 'protontricks'!".to_string());
 }
 
 pub fn is_installed() -> bool {
-    super::command::is_installed("nix-shell")
+    super::command::is_installed("protontricks")
 }
 
 pub fn version() -> Result<String, String> {
