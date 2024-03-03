@@ -13,7 +13,6 @@ let
     gcc
     rustfmt
     clippy
-    protontricks
   ];
 
   system = {
