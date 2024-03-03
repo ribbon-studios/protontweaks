@@ -3,7 +3,7 @@
 let
   version = "0.1.0";
 in
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "protontweaks";
   version = version;
 
