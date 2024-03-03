@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use reqwest::Url;
 use serde::Deserialize;
 
@@ -15,9 +17,15 @@ pub struct App {
 
 #[derive(Debug, Deserialize)]
 pub struct Tweaks {
-    pub dlls: Vec<String>,
-    pub fonts: Vec<String>,
-    pub settings: Vec<String>,
+    pub tricks: Vec<String>,
+    pub env: HashMap<String, String>,
+    pub settings: TweakSettings,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TweakSettings {
+    pub esync: Option<bool>,
+    pub fsync: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -66,22 +74,15 @@ pub fn get(app_id: &str) -> App {
 
 pub fn apply(app: &App) -> Result<(u32, u32), String> {
     trace!("App ID: {}; Name: {}", app.id, app.name);
-    let mut components: Vec<String> = vec![];
 
-    trace!("DLLs: {}", app.tweaks.dlls.len());
-    components.append(&mut app.tweaks.dlls.clone());
-
-    trace!("Fonts: {}", app.tweaks.fonts.len());
-    components.append(&mut app.tweaks.fonts.clone());
-
-    trace!("Settings: {}", app.tweaks.settings.len());
-    components.append(&mut app.tweaks.settings.clone());
-
-    if components.len() == 0 {
-        warn!("No components were found for {} -> {}", app.id, app.name);
+    if app.tweaks.tricks.len() == 0 {
+        warn!("No tricks were found for {} -> {}", app.id, app.name);
         return Ok((0, 0));
     }
 
-    trace!("Installing components for {} -> {}", app.id, app.name);
-    return Ok(protontricks::install::components(&app.id, &components)?);
+    trace!("Installing tricks for {} -> {}", app.id, app.name);
+    return Ok(protontricks::install::components(
+        &app.id,
+        &app.tweaks.tricks,
+    )?);
 }

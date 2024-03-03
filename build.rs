@@ -1,4 +1,4 @@
-use std::{error::Error, process::Command};
+use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     // let git_output = Command::new("git")
