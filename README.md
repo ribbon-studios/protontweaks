@@ -1,4 +1,5 @@
-**:warning: WIP :warning:**
+> [!IMPORTANT]  
+> This is the Protontweaks CLI repository, you can find the `protontweaks` db [over here](https://github.com/rain-cafe/protontweaks-db)
 
 ## Protontweaks
 
@@ -25,5 +26,3 @@ protontweaks <app-id>
 - **Performance**
   - Apply tweaks async so multiple games can be tweaked at once
   - Tweak DB Caching
-- **Tweak DB**
-  - Split into its own repository
