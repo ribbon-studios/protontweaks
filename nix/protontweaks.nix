@@ -13,7 +13,8 @@ rustPlatform.buildRustPackage {
     lockFile = ../Cargo.lock;
   };
 
-  checkFlags = [ ];
+  # Most tests fail due to the isolation
+  doCheck = false;
 
   buildInputs = [
     openssl

@@ -9,10 +9,16 @@ const PROTONTWEAKS_DB: &str = env!("PROTONTWEAKS_DB");
 
 #[derive(Debug, Deserialize)]
 pub struct App {
-    #[serde(skip_deserializing)]
     pub id: String,
     pub name: String,
     pub tweaks: Tweaks,
+    pub issues: Vec<Issue>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Issue {
+    pub description: String,
+    pub solution: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -85,4 +91,40 @@ pub fn apply(app: &App) -> Result<(u32, u32), String> {
         &app.id,
         &app.tweaks.tricks,
     )?);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::tweaks::{get, list, url};
+
+    #[test]
+    fn url_should_create_a_tweaks_url() {
+        assert_eq!(
+            url("tweaks").to_string(),
+            "https://tweaks.rains.cafe/tweaks.json"
+        );
+    }
+
+    #[test]
+    fn list_should_return_the_tweaks_list() {
+        let tweaks = list();
+
+        assert!(
+            tweaks.tweaks.len() > 0,
+            "Expected to receive a list of valid tweaked apps!"
+        );
+    }
+
+    #[test]
+    fn get_should_return_the_tweak_info() {
+        let expected_id = "644930";
+        let tweak = get(expected_id);
+
+        assert_eq!(tweak.id, expected_id);
+        assert_eq!(tweak.issues.len(), 1);
+        assert_eq!(tweak.tweaks.tricks.len(), 1);
+        assert_eq!(tweak.tweaks.env.len(), 0);
+        assert_eq!(tweak.tweaks.settings.esync, None);
+        assert_eq!(tweak.tweaks.settings.fsync, None);
+    }
 }

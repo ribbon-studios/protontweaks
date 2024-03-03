@@ -28,3 +28,18 @@ pub fn is_installed() -> bool {
 pub fn version() -> Result<String, String> {
     protontricks(["--version"])
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::utils::protontricks::{is_installed, version};
+
+    #[test]
+    fn version_should_return_the_version() {
+        assert_eq!(version().is_ok(), true);
+    }
+
+    #[test]
+    fn is_installed_should_return_false_if_not_installed() {
+        assert_eq!(is_installed(), false);
+    }
+}

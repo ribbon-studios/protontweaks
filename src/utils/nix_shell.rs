@@ -46,3 +46,18 @@ pub fn version() -> Result<String, String> {
 pub fn is_installed() -> bool {
     super::command::is_installed("nix-shell")
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::utils::nix_shell::{is_installed, version};
+
+    #[test]
+    fn version_should_return_the_version() {
+        assert_eq!(version().is_ok(), true);
+    }
+
+    #[test]
+    fn is_installed_should_return_true_if_installed() {
+        assert_eq!(is_installed(), true);
+    }
+}
