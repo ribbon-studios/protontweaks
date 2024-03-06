@@ -3,7 +3,7 @@
 
 - [CLI](https://github.com/rain-cafe/protontweaks) _(you are here)_
 - [App](https://github.com/rain-cafe/protontweaks-ui)
-- [Database](https://github.com/rain-cafe/protontweaks-db)
+- [Database / API](https://github.com/rain-cafe/protontweaks-db)
 
 ## Protontweaks
 
