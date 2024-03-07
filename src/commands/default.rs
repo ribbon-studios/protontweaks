@@ -1,7 +1,7 @@
 use owo_colors::OwoColorize;
 
 use crate::{
-    tweaks::{self, App},
+    apps::{self, App},
     utils::protontricks,
 };
 
@@ -19,18 +19,18 @@ pub fn command(app_id: Option<String>) -> Result<(), String> {
         apps
     };
 
-    let app_ids = tweaks::app_ids();
+    let app_ids = apps::list_ids();
 
     let tweaked_apps = apps
         .iter()
         .filter(|app| app_ids.contains(app))
-        .map(|app_id| tweaks::get(&app_id))
+        .map(|app_id| apps::get(&app_id))
         .collect::<Vec<App>>();
 
     let (mut tweaks_applied, mut total_tweaks) = (0, 0);
 
     for app in tweaked_apps {
-        let (app_tweaks_applied, app_total_tweaks) = tweaks::apply(&app)?;
+        let (app_tweaks_applied, app_total_tweaks) = apps::apply(&app)?;
         tweaks_applied += app_tweaks_applied;
         total_tweaks += app_total_tweaks;
     }

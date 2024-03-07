@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     );
     println!(
         "cargo:rustc-env=PROTONTWEAKS_DB={}",
-        "https://api.protontweaks.com/v2"
+        "https://api.protontweaks.com/v3"
     );
     Ok(())
 }

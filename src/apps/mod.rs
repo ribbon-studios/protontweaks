@@ -44,7 +44,7 @@ pub struct TweakSettings {
 pub struct AppsList {
     pub sha: String,
     pub short_sha: String,
-    pub tweaks: Vec<MiniApp>,
+    pub apps: Vec<MiniApp>,
 }
 
 pub fn url(path: &str) -> Url {
@@ -53,8 +53,8 @@ pub fn url(path: &str) -> Url {
     return url.join(&format!("{path}.json")).unwrap();
 }
 
-pub fn apps() -> AppsList {
-    let url = url("tweaks");
+pub fn list() -> AppsList {
+    let url = url("apps");
 
     debug!("Requesting tweaks from '{url}'...");
 
@@ -65,8 +65,8 @@ pub fn apps() -> AppsList {
     response.json::<AppsList>().unwrap()
 }
 
-pub fn app_ids() -> Vec<String> {
-    apps().tweaks.iter().map(|x| x.id.to_owned()).collect()
+pub fn list_ids() -> Vec<String> {
+    list().apps.iter().map(|x| x.id.to_owned()).collect()
 }
 
 pub fn get(app_id: &str) -> App {
@@ -105,29 +105,29 @@ pub fn apply(app: &App) -> Result<(u32, u32), String> {
 
 #[cfg(test)]
 mod tests {
-    use crate::tweaks::{app_ids, apps, get, url};
+    use crate::apps::{get, list, list_ids, url};
 
     #[test]
-    fn url_should_create_a_tweaks_url() {
+    fn url_should_create_a_apps_url() {
         assert_eq!(
-            url("tweaks").to_string(),
-            "https://api.protontweaks.com/tweaks.json"
+            url("apps").to_string(),
+            "https://api.protontweaks.com/apps.json"
         );
     }
 
     #[test]
-    fn apps_should_return_the_tweaks_list() {
-        let apps = apps();
+    fn list_should_return_the_tweaks_list() {
+        let apps_list = list();
 
         assert!(
-            apps.tweaks.len() > 0,
+            apps_list.apps.len() > 0,
             "Expected to receive a list of valid tweaked apps!"
         );
     }
 
     #[test]
-    fn app_ids_should_return_the_tweaks_list() {
-        let ids = app_ids();
+    fn list_ids_should_return_the_tweaks_list() {
+        let ids = list_ids();
 
         assert!(
             ids.len() > 0,

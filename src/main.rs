@@ -6,8 +6,8 @@ use std::{env, str::FromStr};
 use clap::{Parser, Subcommand};
 use log::LevelFilter;
 
+pub mod apps;
 pub mod commands;
-pub mod tweaks;
 pub mod utils;
 
 static VERSION_LONG: &str = concat!(
