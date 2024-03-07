@@ -16,22 +16,10 @@ pub struct App {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Issue {
-    pub description: String,
-    pub solution: String,
-}
-
-#[derive(Debug, Deserialize)]
 pub struct Tweaks {
     pub tricks: Vec<String>,
     pub env: HashMap<String, String>,
     pub settings: TweakSettings,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct MiniApp {
-    pub id: String,
-    pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -41,10 +29,22 @@ pub struct TweakSettings {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct Issue {
+    pub description: String,
+    pub solution: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct AppsList {
     pub sha: String,
     pub short_sha: String,
     pub apps: Vec<MiniApp>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MiniApp {
+    pub id: String,
+    pub name: String,
 }
 
 pub fn url(path: &str) -> Url {
@@ -56,7 +56,7 @@ pub fn url(path: &str) -> Url {
 pub fn list() -> AppsList {
     let url = url("apps");
 
-    debug!("Requesting tweaks from '{url}'...");
+    debug!("Requesting apps from '{url}'...");
 
     let response = reqwest::blocking::get(url).unwrap();
 
@@ -74,14 +74,13 @@ pub fn get(app_id: &str) -> App {
 
     debug!("Requesting file from '{url}'...");
 
-    let response =
-        reqwest::blocking::get(url).expect(&format!("Failed to get tweaks for {}", app_id));
+    let response = reqwest::blocking::get(url).expect(&format!("Failed to get app for {}", app_id));
 
     trace!("Response received!");
 
     let mut app = response
         .json::<App>()
-        .expect(&format!("Failed to parse tweak data for {}", app_id));
+        .expect(&format!("Failed to parse app data for {}", app_id));
 
     app.id = app_id.to_string();
 
@@ -136,15 +135,15 @@ mod tests {
     }
 
     #[test]
-    fn get_should_return_the_tweak_info() {
+    fn get_should_return_the_app_info() {
         let expected_id = "644930";
-        let tweak = get(expected_id);
+        let app = get(expected_id);
 
-        assert_eq!(tweak.id, expected_id);
-        assert_eq!(tweak.issues.len(), 1);
-        assert_eq!(tweak.tweaks.tricks.len(), 1);
-        assert_eq!(tweak.tweaks.env.len(), 0);
-        assert_eq!(tweak.tweaks.settings.esync, None);
-        assert_eq!(tweak.tweaks.settings.fsync, None);
+        assert_eq!(app.id, expected_id);
+        assert_eq!(app.issues.len(), 1);
+        assert_eq!(app.tweaks.tricks.len(), 1);
+        assert_eq!(app.tweaks.env.len(), 0);
+        assert_eq!(app.tweaks.settings.esync, None);
+        assert_eq!(app.tweaks.settings.fsync, None);
     }
 }
