@@ -1,3 +1,4 @@
+use clap::Args;
 use owo_colors::OwoColorize;
 
 use crate::{
@@ -5,10 +6,16 @@ use crate::{
     utils::protontricks,
 };
 
-pub fn command(app_id: Option<String>) -> Result<(), String> {
+#[derive(Debug, Args)]
+pub struct CommandArgs {
+    /// The steam launch command '%command%'
+    pub app_id: Option<String>,
+}
+
+pub fn command(args: CommandArgs) -> Result<(), String> {
     println!("Automatically applying necessary tweaks...");
 
-    let apps = if let Some(app_id) = app_id {
+    let apps = if let Some(app_id) = args.app_id {
         vec![app_id]
     } else {
         let apps = protontricks::list::apps()?;

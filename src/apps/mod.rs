@@ -53,7 +53,7 @@ pub fn url(path: &str) -> Url {
     return url.join(&format!("{path}.json")).unwrap();
 }
 
-pub fn list() -> AppsList {
+pub fn apps_list() -> AppsList {
     let url = url("apps");
 
     debug!("Requesting apps from '{url}'...");
@@ -65,8 +65,12 @@ pub fn list() -> AppsList {
     response.json::<AppsList>().unwrap()
 }
 
+pub fn apps() -> Vec<MiniApp> {
+    apps_list().apps
+}
+
 pub fn list_ids() -> Vec<String> {
-    list().apps.iter().map(|x| x.id.to_owned()).collect()
+    apps_list().apps.iter().map(|x| x.id.to_owned()).collect()
 }
 
 pub fn get(app_id: &str) -> App {
@@ -96,15 +100,14 @@ pub fn apply(app: &App) -> Result<(u32, u32), String> {
     }
 
     trace!("Installing tricks for {} -> {}", app.id, app.name);
-    return Ok(protontricks::install::components(
-        &app.id,
-        &app.tweaks.tricks,
-    )?);
+    let result = protontricks::install::components(&app.id, &app.tweaks.tricks)?;
+
+    return Ok(result);
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::apps::{get, list, list_ids, url};
+    use crate::apps::{apps_list, get, list_ids, url};
 
     #[test]
     fn url_should_create_a_apps_url() {
@@ -115,8 +118,8 @@ mod tests {
     }
 
     #[test]
-    fn list_should_return_the_tweaks_list() {
-        let apps_list = list();
+    fn apps_list_should_return_the_tweaks_list() {
+        let apps_list = apps_list();
 
         assert!(
             apps_list.apps.len() > 0,

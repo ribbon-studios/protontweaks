@@ -9,7 +9,7 @@ pub fn components(app_id: &str, components: &Vec<String>) -> Result<(u32, u32), 
 
     let output = protontricks(args)?;
 
-    // gdiplus already installed, skipping
+    // example: 'gdiplus already installed, skipping'
     let re = Regex::new(r"(?m)^(?<name>[\w-]+) already installed, skipping$").unwrap();
 
     let total_tweaks: u32 = components.len().try_into().unwrap();

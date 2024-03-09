@@ -18,7 +18,7 @@ pub fn apps() -> Result<Vec<String>, String> {
 
 /// Lists all the installed verbs
 pub fn installed(app_id: &str) -> Vec<String> {
-    let Ok(output) = protontricks([app_id, "dlls", "list-installed"]) else {
+    let Ok(output) = protontricks([app_id, "list-installed"]) else {
         return vec![];
     };
 
@@ -32,21 +32,3 @@ pub fn installed(app_id: &str) -> Vec<String> {
 
     results
 }
-
-pub fn installed_fonts(app_id: &str) -> Vec<String> {
-    let Ok(output) = protontricks([app_id, "dlls", "list-installed"]) else {
-        return vec![];
-    };
-
-    let re = Regex::new(r"(?m)^(?<name>(?:[^-]{2})[-\w]+)$").unwrap();
-
-    let mut results = vec![];
-
-    for caps in re.captures_iter(&output) {
-        results.push(caps["name"].to_string())
-    }
-
-    results
-}
-
-// protontricks 644930 dlls list-installed

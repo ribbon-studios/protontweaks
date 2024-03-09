@@ -1,14 +1,22 @@
+use owo_colors::OwoColorize;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
-use std::{env, str::FromStr};
+use std::{
+    env,
+    fs::{self, OpenOptions},
+    str::FromStr,
+};
 
 use clap::{Parser, Subcommand};
+use commands::{list, run, setup};
 use log::LevelFilter;
 
 pub mod apps;
 pub mod commands;
 pub mod utils;
+
+static LOG_DIR: &str = "/tmp";
 
 static VERSION_LONG: &str = concat!(
     env!("CARGO_PKG_VERSION"),
@@ -20,46 +28,27 @@ static VERSION_LONG: &str = concat!(
 );
 
 #[derive(Parser, Debug)]
-#[command(version, about)]
+#[command(author, version, about)]
 #[command(long_version = VERSION_LONG)]
+#[command(args_conflicts_with_subcommands = true)]
 struct Cli {
-    /// The id of the steam app
-    app_id: Option<String>,
-
     #[command(subcommand)]
     command: Option<Commands>,
+
+    #[command(flatten)]
+    run: run::CommandArgs,
 }
 
 #[derive(Debug, Subcommand)]
 enum Commands {
-    // /// Clones repos
-    // #[command(arg_required_else_help = true)]
-    // Clone {
-    //     /// The remote to clone
-    //     remote: String,
-    // },
-    // /// Compare two commits
-    // Diff {
-    //     #[arg(value_name = "COMMIT")]
-    //     base: Option<OsString>,
-    //     #[arg(value_name = "COMMIT")]
-    //     head: Option<OsString>,
-    //     #[arg(last = true)]
-    //     path: Option<OsString>,
-    //     #[arg(
-    //         long,
-    //         require_equals = true,
-    //         value_name = "WHEN",
-    //         num_args = 0..=1,
-    //         default_value_t = ColorWhen::Auto,
-    //         default_missing_value = "always",
-    //         value_enum
-    //     )]
-    //     color: ColorWhen,
-    // },
-    // Stash(StashArgs),
-    // #[command(external_subcommand)]
-    // External(Vec<OsString>),
+    /// Lists the apps installed on Steam
+    List,
+    /// Applies any necessary tweaks to a given game
+    Setup(setup::CommandArgs),
+    /// [experimental]: Runs the steam launch command and applies any necessary tweaks
+    Run(run::CommandArgs),
+    /// [placeholder]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
+    Watch,
 }
 
 fn get_log_level() -> LevelFilter {
@@ -68,18 +57,36 @@ fn get_log_level() -> LevelFilter {
 }
 
 fn main() {
+    fs::create_dir_all(LOG_DIR).expect("Failed to create log file directory!");
+
+    let log_file = Box::new(
+        OpenOptions::new()
+            .create(true)
+            .write(true)
+            .append(true)
+            .open(format!("{0}/{1}", LOG_DIR, "protontweaks.log"))
+            .expect("Failed to open log file"),
+    );
+
     pretty_env_logger::formatted_builder()
+        .target(pretty_env_logger::env_logger::Target::Pipe(log_file))
         .filter(None, get_log_level())
+        .filter(None, LevelFilter::Debug)
         .filter(Some("reqwest"), LevelFilter::Warn)
         .init();
 
     let args = Cli::parse();
 
-    let result = match args.command {
-        _ => commands::default::command(args.app_id),
+    let command = args.command.unwrap_or(Commands::Run(args.run));
+
+    let result = match command {
+        Commands::List => list::command(),
+        Commands::Setup(args) => setup::command(args),
+        Commands::Run(args) => run::command(args),
+        Commands::Watch => panic!("Not implemented!"),
     };
 
     if result.is_err() {
-        println!("ERROR: {0}", result.unwrap_err());
+        let _ = println!("ERROR: {0}", result.unwrap_err()).red();
     }
 }

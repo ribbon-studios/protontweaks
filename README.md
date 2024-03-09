@@ -68,10 +68,29 @@ We provide a [binary and deb package](https://github.com/rain-cafe/protontweaks/
 ### Usage
 
 ```sh
-# Applies tweaks to all apps
-protontweaks
-# Applies tweaks to one app
-protontweaks <app-id>
+$ protontweaks --help
+
+crowdsourced protontricks
+
+Usage: protontweaks [COMMAND_ARGS]...
+       protontweaks <COMMAND>
+
+Commands:
+  list   Lists the apps installed on Steam
+  setup  Applies any necessary tweaks to a given game
+  # This *may* work on non NixOS devices, however I have no way of actually confirming that.
+  # Its still a heavy WIP and there's really no guarantee it'll work however using it will not cause any harm.
+  run    [experimental]: Runs the steam launch command and applies any necessary tweaks
+  # Not actually implemented
+  watch  [placeholder]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
+  help   Print this message or the help of the given subcommand(s)
+
+Arguments:
+  [COMMAND_ARGS]...  The steam launch command '%command%'
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
 ```
 
 ### TODO
