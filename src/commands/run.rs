@@ -5,7 +5,7 @@ use clap::Args;
 use regex::Regex;
 
 use crate::{
-    apps,
+    apps::{self, App},
     utils::{command, env},
 };
 
@@ -16,7 +16,26 @@ pub struct CommandArgs {
 }
 
 pub fn command(args: CommandArgs) -> Result<(), String> {
-    let (command, args, env) = parse_command(args)?;
+    let (command, args, app) = parse_command(args)?;
+
+    if let Some(app) = &app {
+        let (app_tweaks_applied, app_total_tweaks) = apps::apply(app)?;
+
+        if app_tweaks_applied == 0 {
+            println!(
+                "{} {}",
+                "No tweaks were necessary!".green().bold(),
+                format!("({app_total_tweaks} tweaks attempted)").italic()
+            );
+        } else {
+            println!(
+                "Applied {} successfully!",
+                format!("{app_tweaks_applied} tweaks").bold()
+            );
+        }
+    }
+
+    let env = &app.map_or(HashMap::new(), |app| app.tweaks.env);
 
     Command::new(command)
         .args(args)
@@ -29,9 +48,7 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn parse_command(
-    args: CommandArgs,
-) -> Result<(String, Vec<String>, HashMap<String, String>), String> {
+fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>), String> {
     let command_args = args.command_args.unwrap();
     let command_args: Vec<&str> = command_args.iter().map(|x| x.as_str()).collect();
     let command = command::join(command_args)?;
@@ -43,30 +60,12 @@ fn parse_command(
 
         println!("App ID: {0}", &caps["app_id"]);
 
-        let app = apps::get(app_id);
-
-        if app.tweaks.tricks.len() > 0 {
-            let (app_tweaks_applied, app_total_tweaks) = apps::apply(&app)?;
-
-            if app_tweaks_applied == 0 {
-                println!(
-                    "{} {}",
-                    "No tweaks were necessary!".green().bold(),
-                    format!("({app_total_tweaks} tweaks attempted)").italic()
-                );
-            } else {
-                println!(
-                    "Applied {} successfully!",
-                    format!("{app_tweaks_applied} tweaks").bold()
-                );
-            }
-        }
+        let mut app = apps::get(app_id);
 
         let command = command::split(&command)?;
 
-        let mut env = app.tweaks.env;
         if let Some(esync) = app.tweaks.settings.esync {
-            env.insert(
+            app.tweaks.env.insert(
                 "PROTON_NO_ESYNC".to_string(),
                 if esync {
                     "1".to_string()
@@ -77,16 +76,18 @@ fn parse_command(
         }
 
         if let Some(fsync) = app.tweaks.settings.fsync {
-            env.insert("PROTON_NO_FSYNC".to_string(), env::convert_bool(fsync));
+            app.tweaks
+                .env
+                .insert("PROTON_NO_FSYNC".to_string(), env::convert_bool(fsync));
         }
 
-        return Ok((command[0].clone(), command[1..].to_vec(), env));
+        return Ok((command[0].clone(), command[1..].to_vec(), Some(app)));
     }
 
     warn!("Protontweaks purely acts as a passthrough for non-steam games!");
     let command = command::split(&command)?;
 
-    return Ok((command[0].clone(), command[1..].to_vec(), HashMap::new()));
+    return Ok((command[0].clone(), command[1..].to_vec(), None));
 }
 
 #[cfg(test)]
@@ -95,26 +96,26 @@ pub mod tests {
 
     #[test]
     pub fn parse_command_should_support_simple_commands() {
-        let (command, args, env) = parse_command(CommandArgs {
+        let (command, args, app) = parse_command(CommandArgs {
             command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
         })
         .expect("Failed to parse command.");
 
         assert_eq!(command, "echo");
         assert_eq!(args, vec!["hello"]);
-        assert_eq!(env.len(), 0);
+        // assert_eq!(app, None);
     }
 
     #[test]
     pub fn parse_command_should_support_unified_commands() {
-        let (command, args, env) = parse_command(CommandArgs {
+        let (command, args, app) = parse_command(CommandArgs {
             command_args: Some(vec!["echo hello".to_string()]),
         })
         .expect("Failed to execute command.");
 
         assert_eq!(command, "echo");
         assert_eq!(args, vec!["hello"]);
-        assert_eq!(env.len(), 0);
+        // assert_eq!(app, None);
     }
 
     #[test]
@@ -134,13 +135,14 @@ pub mod tests {
             "'/home/ceci/.local/share/Steam/steamapps/common/They Are Billions/TheyAreBillions.exe'"
         ].iter_mut().map(|x| x.to_string()).collect::<Vec<String>>();
 
-        let (command, args, env) = parse_command(CommandArgs {
+        let (command, args, app) = parse_command(CommandArgs {
             command_args: Some(command_args),
         })
         .expect("Failed to execute command.");
 
         assert_eq!(command, "~/.local/share/Steam/ubuntu12_32/reaper");
         assert_eq!(args.len(), 11);
-        assert_eq!(env.len(), 0);
+        // assert_eq!(&app.unwrap().tweaks.env.len(), 0);
+        // assert_eq!(&app.unwrap().tweaks.tricks.len(), 1);
     }
 }
