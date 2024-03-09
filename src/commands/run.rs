@@ -1,5 +1,5 @@
 use owo_colors::OwoColorize;
-use std::process::Command;
+use std::{collections::HashMap, process::Command};
 
 use clap::Args;
 use regex::Regex;
@@ -16,6 +16,22 @@ pub struct CommandArgs {
 }
 
 pub fn command(args: CommandArgs) -> Result<(), String> {
+    let (command, args, env) = parse_command(args)?;
+
+    Command::new(command)
+        .args(args)
+        .envs(env)
+        .spawn()
+        .expect("Failed to run command")
+        .wait()
+        .expect("Failed to wait for command");
+
+    Ok(())
+}
+
+fn parse_command(
+    args: CommandArgs,
+) -> Result<(String, Vec<String>, HashMap<String, String>), String> {
     let command_args = args.command_args.unwrap();
     let command_args: Vec<&str> = command_args.iter().map(|x| x.as_str()).collect();
     let command = command::join(command_args)?;
@@ -64,52 +80,47 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
             env.insert("PROTON_NO_FSYNC".to_string(), env::convert_bool(fsync));
         }
 
-        Command::new(&command[0])
-            .args(&command[1..])
-            .envs(env)
-            .spawn()
-            .expect("Failed to run command")
-            .wait()
-            .expect("Failed to wait for command");
-    } else {
-        warn!("Protontweaks purely acts as a passthrough for non-steam games!");
-        let command = command::split(&command)?;
-
-        Command::new(&command[0])
-            .args(&command[1..])
-            .spawn()
-            .expect("Failed to run command")
-            .wait()
-            .expect("Failed to wait for command");
+        return Ok((command[0].clone(), command[1..].to_vec(), env));
     }
 
-    Ok(())
+    warn!("Protontweaks purely acts as a passthrough for non-steam games!");
+    let command = command::split(&command)?;
+
+    return Ok((command[0].clone(), command[1..].to_vec(), HashMap::new()));
 }
 
 #[cfg(test)]
 pub mod tests {
-    use super::{command, CommandArgs};
+    use super::{parse_command, CommandArgs};
 
     #[test]
-    pub fn command_should_support_simple_commands() {
-        command(CommandArgs {
+    pub fn parse_command_should_support_simple_commands() {
+        let (command, args, env) = parse_command(CommandArgs {
             command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
         })
-        .expect("Failed to execute command.");
+        .expect("Failed to parse command.");
+
+        assert_eq!(command, "echo");
+        assert_eq!(args, vec!["hello"]);
+        assert_eq!(env.len(), 0);
     }
 
     #[test]
-    pub fn command_should_support_unified_commands() {
-        command(CommandArgs {
+    pub fn parse_command_should_support_unified_commands() {
+        let (command, args, env) = parse_command(CommandArgs {
             command_args: Some(vec!["echo hello".to_string()]),
         })
         .expect("Failed to execute command.");
+
+        assert_eq!(command, "echo");
+        assert_eq!(args, vec!["hello"]);
+        assert_eq!(env.len(), 0);
     }
 
     #[test]
-    pub fn command_should_support_steam_launch_commands() {
+    pub fn parse_command_should_support_steam_launch_commands() {
         let command_args = vec![
-            "/home/ceci/.local/share/Steam/ubuntu12_32/reaper",
+            "~/.local/share/Steam/ubuntu12_32/reaper",
             "SteamLaunch",
             "AppId=644930",
             "--",
@@ -123,9 +134,13 @@ pub mod tests {
             "'/home/ceci/.local/share/Steam/steamapps/common/They Are Billions/TheyAreBillions.exe'"
         ].iter_mut().map(|x| x.to_string()).collect::<Vec<String>>();
 
-        command(CommandArgs {
+        let (command, args, env) = parse_command(CommandArgs {
             command_args: Some(command_args),
         })
         .expect("Failed to execute command.");
+
+        assert_eq!(command, "~/.local/share/Steam/ubuntu12_32/reaper");
+        assert_eq!(args.len(), 11);
+        assert_eq!(env.len(), 0);
     }
 }
