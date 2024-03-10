@@ -103,7 +103,7 @@ pub mod tests {
 
         assert_eq!(command, "echo");
         assert_eq!(args, vec!["hello"]);
-        // assert_eq!(app, None);
+        assert!(app.is_none(), "Expected app to not be defined!");
     }
 
     #[test]
@@ -115,7 +115,7 @@ pub mod tests {
 
         assert_eq!(command, "echo");
         assert_eq!(args, vec!["hello"]);
-        // assert_eq!(app, None);
+        assert!(app.is_none(), "Expected app to not be defined!");
     }
 
     #[test]
@@ -142,7 +142,10 @@ pub mod tests {
 
         assert_eq!(command, "~/.local/share/Steam/ubuntu12_32/reaper");
         assert_eq!(args.len(), 11);
-        // assert_eq!(&app.unwrap().tweaks.env.len(), 0);
-        // assert_eq!(&app.unwrap().tweaks.tricks.len(), 1);
+
+        let app = app.unwrap();
+
+        assert_eq!(app.tweaks.env.len(), 0);
+        assert_eq!(app.tweaks.tricks.len(), 1);
     }
 }
