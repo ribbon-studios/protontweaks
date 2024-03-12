@@ -91,7 +91,8 @@ pub fn get(app_id: &str) -> App {
     app
 }
 
-pub fn apply(app: &App) -> Result<(u32, u32), String> {
+/// Applies the app and returns a result of whether it was successful
+pub fn try_apply(app: &App) -> Result<(u32, u32), String> {
     trace!("App ID: {}; Name: {}", app.id, app.name);
 
     if app.tweaks.tricks.len() == 0 {
@@ -100,9 +101,25 @@ pub fn apply(app: &App) -> Result<(u32, u32), String> {
     }
 
     trace!("Installing tricks for {} -> {}", app.id, app.name);
-    let result = protontricks::install::components(&app.id, &app.tweaks.tricks)?;
+    let tweaks_applied = protontricks::install::components(&app.id, &app.tweaks.tricks)?;
 
-    return Ok(result);
+    return Ok((tweaks_applied, app.tweaks.tricks.len().try_into().unwrap()));
+}
+
+/// Applies the app and panics if a failure occurs.
+pub fn apply(app: &App) -> (u32, u32) {
+    return try_apply(app).unwrap();
+}
+
+/// Applies the app, if an error occurs it simply logs it and returns that no tweaks were applied
+pub fn apply_safe(app: &App) -> (u32, u32) {
+    match try_apply(app) {
+        Ok(result) => result,
+        Err(e) => {
+            error!("{e}");
+            (0, app.tweaks.tricks.len().try_into().unwrap())
+        }
+    }
 }
 
 #[cfg(test)]

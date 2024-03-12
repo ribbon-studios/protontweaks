@@ -1,12 +1,7 @@
-use owo_colors::OwoColorize;
 extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
-use std::{
-    env,
-    fs::{self, OpenOptions},
-    str::FromStr,
-};
+use std::{env, str::FromStr};
 
 use clap::{Parser, Subcommand};
 use commands::{list, run, setup};
@@ -15,8 +10,6 @@ use log::LevelFilter;
 pub mod apps;
 pub mod commands;
 pub mod utils;
-
-static LOG_DIR: &str = "/tmp";
 
 static VERSION_LONG: &str = concat!(
     env!("CARGO_PKG_VERSION"),
@@ -53,25 +46,12 @@ enum Commands {
 
 fn get_log_level() -> LevelFilter {
     let default_level = env::var("RUST_LOG").unwrap_or_default();
-    LevelFilter::from_str(&default_level).unwrap_or(LevelFilter::Off)
+    LevelFilter::from_str(&default_level).unwrap_or(LevelFilter::Warn)
 }
 
 fn main() {
-    fs::create_dir_all(LOG_DIR).expect("Failed to create log file directory!");
-
-    let log_file = Box::new(
-        OpenOptions::new()
-            .create(true)
-            .write(true)
-            .append(true)
-            .open(format!("{0}/{1}", LOG_DIR, "protontweaks.log"))
-            .expect("Failed to open log file"),
-    );
-
     pretty_env_logger::formatted_builder()
-        .target(pretty_env_logger::env_logger::Target::Pipe(log_file))
         .filter(None, get_log_level())
-        .filter(None, LevelFilter::Debug)
         .filter(Some("reqwest"), LevelFilter::Warn)
         .init();
 
@@ -87,6 +67,9 @@ fn main() {
     };
 
     if result.is_err() {
-        let _ = println!("ERROR: {0}", result.unwrap_err()).red();
+        #[allow(unused_must_use)]
+        {
+            error!("{0}", result.unwrap_err());
+        }
     }
 }

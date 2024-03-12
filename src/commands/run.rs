@@ -19,7 +19,7 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
     let (command, args, app) = parse_command(args)?;
 
     if let Some(app) = &app {
-        let (app_tweaks_applied, app_total_tweaks) = apps::apply(app)?;
+        let (app_tweaks_applied, app_total_tweaks) = apps::apply_safe(app);
 
         if app_tweaks_applied == 0 {
             println!(

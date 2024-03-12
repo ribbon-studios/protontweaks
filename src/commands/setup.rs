@@ -37,7 +37,7 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
     let (mut tweaks_applied, mut total_tweaks) = (0, 0);
 
     for app in tweaked_apps {
-        let (app_tweaks_applied, app_total_tweaks) = apps::apply(&app)?;
+        let (app_tweaks_applied, app_total_tweaks) = apps::try_apply(&app)?;
         tweaks_applied += app_tweaks_applied;
         total_tweaks += app_total_tweaks;
     }
