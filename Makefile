@@ -4,3 +4,8 @@ ifeq ($(shell printenv IN_NIX_SHELL),)
 else
 	$(info You are already running in a nix shell!)
 endif
+
+validate:
+	nix build
+	nix shell --command steam
+	killall steam

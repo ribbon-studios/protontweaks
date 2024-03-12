@@ -1,11 +1,17 @@
 use std::{ffi::OsStr, process::Command};
 
-pub fn exec<I, S>(command: &'static str, args: I) -> Result<String, String>
+pub fn exec<I, S>(name: &'static str, args: I) -> Result<String, String>
 where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
 {
-    match Command::new(command).args(args).output() {
+    let mut command = Command::new(name);
+
+    command.args(args);
+
+    trace!("Running command... {:?}", command);
+
+    match command.output() {
         Ok(output) => {
             if output.status.success() {
                 Ok(String::from_utf8(output.stdout).unwrap())
@@ -13,7 +19,7 @@ where
                 Err(String::from_utf8(output.stderr).unwrap())
             }
         }
-        Err(_) => Err(format!("Failed to call {command}")),
+        Err(_) => Err(format!("Failed to call {name}")),
     }
 }
 
