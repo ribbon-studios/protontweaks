@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use reqwest::Url;
+use reqwest::{StatusCode, Url};
 use serde::Deserialize;
 
 use crate::utils::protontricks;
@@ -24,8 +24,8 @@ pub struct Tweaks {
 
 #[derive(Debug, Deserialize)]
 pub struct TweakSettings {
-    pub esync: Option<bool>,
-    pub fsync: Option<bool>,
+    pub gamemode: Option<bool>,
+    pub mangohud: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -60,7 +60,7 @@ pub fn apps_list() -> AppsList {
 
     let response = reqwest::blocking::get(url).unwrap();
 
-    trace!("Response received!");
+    trace!("Apps received!");
 
     response.json::<AppsList>().unwrap()
 }
@@ -73,22 +73,35 @@ pub fn list_ids() -> Vec<String> {
     apps_list().apps.iter().map(|x| x.id.to_owned()).collect()
 }
 
-pub fn get(app_id: &str) -> App {
+pub fn try_get(app_id: &str) -> Result<App, String> {
     let url = url(app_id);
 
     debug!("Requesting file from '{url}'...");
 
-    let response = reqwest::blocking::get(url).expect(&format!("Failed to get app for {}", app_id));
+    let response = reqwest::blocking::get(url).map_err(|e| {
+        warn!("{}", e.to_string());
+        e.to_string()
+    })?;
 
-    trace!("Response received!");
+    if response.status() == StatusCode::NOT_FOUND {
+        let message = format!("App {app_id} does not exist!");
+        info!("{message}");
+        return Err(message);
+    }
+
+    trace!("App received!");
 
     let mut app = response
         .json::<App>()
-        .expect(&format!("Failed to parse app data for {}", app_id));
+        .map_err(|_| "Failed to parse app info".to_string())?;
 
     app.id = app_id.to_string();
 
-    app
+    Ok(app)
+}
+
+pub fn get(app_id: &str) -> App {
+    try_get(app_id).unwrap()
 }
 
 /// Applies the app and returns a result of whether it was successful

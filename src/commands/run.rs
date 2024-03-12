@@ -60,28 +60,11 @@ fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>)
 
         println!("App ID: {0}", &caps["app_id"]);
 
-        let mut app = apps::get(app_id);
+        let app = apps::try_get(app_id).ok();
 
         let command = command::split(&command)?;
 
-        if let Some(esync) = app.tweaks.settings.esync {
-            app.tweaks.env.insert(
-                "PROTON_NO_ESYNC".to_string(),
-                if esync {
-                    "1".to_string()
-                } else {
-                    "0".to_string()
-                },
-            );
-        }
-
-        if let Some(fsync) = app.tweaks.settings.fsync {
-            app.tweaks
-                .env
-                .insert("PROTON_NO_FSYNC".to_string(), env::convert_bool(fsync));
-        }
-
-        return Ok((command[0].clone(), command[1..].to_vec(), Some(app)));
+        return Ok((command[0].clone(), command[1..].to_vec(), app));
     }
 
     warn!("Protontweaks purely acts as a passthrough for non-steam games!");

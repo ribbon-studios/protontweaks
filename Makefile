@@ -6,6 +6,6 @@ else
 endif
 
 validate:
+	killall steam && sleep 5
 	nix build
 	nix shell --command steam
-	killall steam

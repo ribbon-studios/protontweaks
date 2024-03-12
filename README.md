@@ -79,10 +79,6 @@ Usage: protontweaks [COMMAND_ARGS]...
 Commands:
   list   Lists the apps installed on Steam
   setup  Applies any necessary tweaks to a given game
-
-  # This *may* work on non NixOS devices, however I have no way of actually confirming that.
-  # At the bare minimum it should purely act as a passthrough and launch the game at best it'll
-  # actually install tricks
   run    [experimental]: Runs the steam launch command and applies any necessary tweaks
   # Not actually implemented
   watch  [placeholder]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
