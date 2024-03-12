@@ -6,7 +6,7 @@ use regex::Regex;
 
 use crate::{
     apps::{self, App},
-    utils::{command, env},
+    utils::command,
 };
 
 #[derive(Debug, Args)]

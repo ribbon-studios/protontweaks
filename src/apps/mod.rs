@@ -176,7 +176,7 @@ mod tests {
         assert_eq!(app.issues.len(), 1);
         assert_eq!(app.tweaks.tricks.len(), 1);
         assert_eq!(app.tweaks.env.len(), 0);
-        assert_eq!(app.tweaks.settings.esync, None);
-        assert_eq!(app.tweaks.settings.fsync, None);
+        assert_eq!(app.tweaks.settings.gamemode, None);
+        assert_eq!(app.tweaks.settings.mangohud, None);
     }
 }

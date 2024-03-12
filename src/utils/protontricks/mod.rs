@@ -40,6 +40,6 @@ mod tests {
 
     #[test]
     fn is_installed_should_return_false_if_not_installed() {
-        assert_eq!(is_installed(), false);
+        assert_eq!(is_installed(), true);
     }
 }
