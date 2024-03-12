@@ -44,7 +44,7 @@ pub fn version() -> Result<String, String> {
 }
 
 pub fn is_installed() -> bool {
-    super::command::is_installed("nix-shell")
+    version().is_ok()
 }
 
 #[cfg(test)]

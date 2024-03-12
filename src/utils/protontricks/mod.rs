@@ -22,7 +22,7 @@ where
 }
 
 pub fn is_installed() -> bool {
-    super::command::is_installed("protontricks")
+    version().is_ok()
 }
 
 pub fn version() -> Result<String, String> {
