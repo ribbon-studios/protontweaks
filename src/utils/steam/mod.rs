@@ -16,8 +16,16 @@ impl Steam {
     }
 
     fn discover_localconfig() -> String {
+        let home = home_dir().unwrap();
+        let mut home = home.to_str().unwrap();
+
+        if home == "/root" {
+            // Fallback to checking all home folders when running as root
+            home = "/home";
+        }
+
         let search: Vec<String> = SearchBuilder::default()
-            .location(home_dir().unwrap().to_str().unwrap())
+            .location(home)
             .search_input("localconfig")
             .limit(1)
             .ext("vdf")
