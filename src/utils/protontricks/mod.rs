@@ -31,6 +31,8 @@ pub fn version() -> Result<String, String> {
 
 #[cfg(test)]
 mod tests {
+    use std::env;
+
     use crate::utils::protontricks::{is_installed, version};
 
     #[test]
@@ -40,6 +42,6 @@ mod tests {
 
     #[test]
     fn is_installed_should_return_false_if_not_installed() {
-        assert_eq!(is_installed(), true);
+        assert_eq!(is_installed(), !env::var("CI").is_ok());
     }
 }
