@@ -1,4 +1,7 @@
-[![Coveralls][coveralls-image]][coveralls-url] [![CI Build][github-actions-image]][github-actions-url] [![Maintainability][maintainability-image]][maintainability-url]
+[![Coveralls][coveralls-image]][coveralls-url] [![CI Build][github-actions-image]][github-actions-url]
+
+<!-- TODO: Find a good maintainability tool -->
+<!-- [![Maintainability][maintainability-image]][maintainability-url] -->
 
 > [!IMPORTANT]  
 > This is the Protontweaks CLI repository, you can find its sister repositories at the following links!
