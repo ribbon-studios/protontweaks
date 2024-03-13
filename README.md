@@ -99,5 +99,5 @@ Options:
 [github-actions-url]: https://github.com/rain-cafe/protontweaks/actions/workflows/ci.yml?query=branch%3Amain
 [coveralls-image]: https://img.shields.io/coveralls/rain-cafe/protontweaks.svg
 [coveralls-url]: https://coveralls.io/github/rain-cafe/protontweaks?branch=main
-[maintainability-image]: https://img.shields.io/codeclimate/maintainability/rain-cafe/refreshly
-[maintainability-url]: https://codeclimate.com/github/rain-cafe/refreshly/maintainability
+[maintainability-image]: https://img.shields.io/codeclimate/maintainability/rain-cafe/protontweaks
+[maintainability-url]: https://codeclimate.com/github/rain-cafe/protontweaks/maintainability
