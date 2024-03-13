@@ -43,4 +43,15 @@ pkgs.mkShell {
   LLVM_COV = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-cov";
   LLVM_PROFDATA = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-profdata";
   RUST_LOG = "trace";
+
+  LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${ with pkgs; lib.makeLibraryPath [
+      xorg.libX11
+      xorg.libXcursor
+      xorg.libXrandr
+      xorg.libXi
+      pkg-config
+      wayland
+      libxkbcommon
+      fontconfig
+  ] }";
 }
