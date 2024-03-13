@@ -29,7 +29,7 @@
           pkgs = legacyPackages.${system};
         in
         {
-          default = pkgs.callPackage ./nix/protontweaks.nix { };
+          default = pkgs.callPackage ./nix/pkgs/protontweaks.nix { };
         });
     };
 }

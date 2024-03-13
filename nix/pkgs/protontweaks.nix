@@ -7,10 +7,10 @@ rustPlatform.buildRustPackage {
   pname = "protontweaks";
   version = version;
 
-  src = ../.;
+  src = ../../.;
 
   cargoLock = {
-    lockFile = ../Cargo.lock;
+    lockFile = ../../Cargo.lock;
   };
 
   # Most tests fail due to the isolation
