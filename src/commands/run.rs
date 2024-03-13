@@ -50,27 +50,33 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
 
 fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>), String> {
     let command_args = args.command_args.unwrap();
+    let is_proton = command_args
+        .iter()
+        .any(|arg| arg.to_lowercase().contains("proton"));
+
     let command_args: Vec<&str> = command_args.iter().map(|x| x.as_str()).collect();
     let command = command::join(command_args)?;
 
-    let re = Regex::new(r"AppId=(?<app_id>\d+)").unwrap();
+    let app = if is_proton {
+        let re = Regex::new(r"AppId=(?<app_id>\d+)").unwrap();
 
-    if let Some(caps) = re.captures(&command) {
-        let app_id = &caps["app_id"];
+        if let Some(caps) = re.captures(&command) {
+            let app_id = &caps["app_id"];
 
-        println!("App ID: {0}", &caps["app_id"]);
+            println!("App ID: {0}", &caps["app_id"]);
 
-        let app = apps::try_get(app_id).ok();
+            apps::try_get(app_id).ok()
+        } else {
+            warn!("Unable to detect App ID, acting purely as a passthrough...");
+            None
+        }
+    } else {
+        info!("Native app detected, skipping proton steps...");
+        None
+    };
 
-        let command = command::split(&command)?;
-
-        return Ok((command[0].clone(), command[1..].to_vec(), app));
-    }
-
-    warn!("Protontweaks purely acts as a passthrough for non-steam games!");
     let command = command::split(&command)?;
-
-    return Ok((command[0].clone(), command[1..].to_vec(), None));
+    return Ok((command[0].clone(), command[1..].to_vec(), app));
 }
 
 #[cfg(test)]
