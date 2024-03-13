@@ -44,16 +44,18 @@ We provide a [binary and deb package](https://github.com/rain-cafe/protontweaks/
           modules = [
             # This is just an example, you can obviously format this however you want!
             ({ pkgs, ... }: {
+              imports = [
+                inputs.protontweaks.nixosModules.protontweaks
+              ];
+
               nixpkgs = {
                 overlays = [
                   inputs.protontweaks.overlay
                 ];
               };
 
-              environment.systemPackages = with pkgs; [
-                protontweaks
-                # protontricks -- May be necessary if steam can't find nix-shell
-              ];
+              # This will install protontweaks and enable the watch service that automatically updates the launch options
+              services.protontweaks.enable = true;
             })
             # Your NixOS Modules here...
             ../defaults/configuration.nix
@@ -80,8 +82,7 @@ Commands:
   list   Lists the apps installed on Steam
   setup  Applies any necessary tweaks to a given game
   run    [experimental]: Runs the steam launch command and applies any necessary tweaks
-  # Not actually implemented
-  watch  [placeholder]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
+  watch  [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
 
   help   Print this message or the help of the given subcommand(s)
 

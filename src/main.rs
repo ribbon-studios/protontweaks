@@ -4,7 +4,7 @@ extern crate log;
 use std::{env, str::FromStr};
 
 use clap::{Parser, Subcommand};
-use commands::{list, run, setup};
+use commands::{list, run, setup, watch};
 use log::LevelFilter;
 
 pub mod apps;
@@ -40,7 +40,7 @@ enum Commands {
     Setup(setup::CommandArgs),
     /// [experimental]: Runs the steam launch command and applies any necessary tweaks
     Run(run::CommandArgs),
-    /// [placeholder]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
+    /// Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
     Watch,
 }
 
@@ -51,8 +51,8 @@ fn get_log_level() -> LevelFilter {
 
 fn main() {
     pretty_env_logger::formatted_builder()
-        .filter(None, get_log_level())
-        .filter(Some("reqwest"), LevelFilter::Warn)
+        .filter(None, LevelFilter::Warn)
+        .filter(Some("protontweaks"), get_log_level())
         .init();
 
     let args = Cli::parse();
@@ -63,7 +63,7 @@ fn main() {
         Commands::List => list::command(),
         Commands::Setup(args) => setup::command(args),
         Commands::Run(args) => run::command(args),
-        Commands::Watch => panic!("Not implemented!"),
+        Commands::Watch => watch::command(),
     };
 
     if result.is_err() {
