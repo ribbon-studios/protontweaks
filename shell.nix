@@ -10,6 +10,8 @@ let
     nixpkgs-fmt
     rustc
     cargo
+    rustc.llvmPackages.llvm
+    cargo-llvm-cov
     gcc
     rustfmt
     clippy
@@ -38,5 +40,7 @@ pkgs.mkShell {
   inherit buildInputs;
 
   RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+  LLVM_COV = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-cov";
+  LLVM_PROFDATA = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-profdata";
   RUST_LOG = "trace";
 }
