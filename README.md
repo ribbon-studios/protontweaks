@@ -83,7 +83,6 @@ Commands:
   setup  Applies any necessary tweaks to a given game
   run    [experimental]: Runs the steam launch command and applies any necessary tweaks
   watch  [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
-
   help   Print this message or the help of the given subcommand(s)
 
 Arguments:
@@ -93,11 +92,3 @@ Options:
   -h, --help     Print help
   -V, --version  Print version
 ```
-
-### TODO
-
-- **Convenience**
-  - Add the ability to install a watch service that will detect games being installed to steam
-- **Performance**
-  - Apply tweaks async so multiple games can be tweaked at once
-  - Tweak DB Caching
