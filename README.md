@@ -1,3 +1,5 @@
+[![Coveralls][coveralls-image]][coveralls-url] [![CI Build][github-actions-image]][github-actions-url] [![Maintainability][maintainability-image]][maintainability-url]
+
 > [!IMPORTANT]  
 > This is the Protontweaks CLI repository, you can find its sister repositories at the following links!
 
@@ -92,3 +94,10 @@ Options:
   -h, --help     Print help
   -V, --version  Print version
 ```
+
+[github-actions-image]: https://img.shields.io/github/actions/workflow/status/rain-cafe/protontweaks/ci.yml?event=push
+[github-actions-url]: https://github.com/rain-cafe/protontweaks/actions/workflows/ci.yml?query=branch%3Amain
+[coveralls-image]: https://img.shields.io/coveralls/rain-cafe/protontweaks.svg
+[coveralls-url]: https://coveralls.io/github/rain-cafe/protontweaks?branch=main
+[maintainability-image]: https://img.shields.io/codeclimate/maintainability/rain-cafe/refreshly
+[maintainability-url]: https://codeclimate.com/github/rain-cafe/refreshly/maintainability
