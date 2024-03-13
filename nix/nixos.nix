@@ -21,7 +21,7 @@ in
       protontricks # Install this for now until we figure out why nix-shell isn't working
     ];
 
-    systemd.services.foo = mkIf (cfg.watch.enable) {
+    systemd.services.protontweaks = mkIf (cfg.watch.enable) {
       enable = true;
       description = "Protontweaks Watch Service";
       unitConfig = {
