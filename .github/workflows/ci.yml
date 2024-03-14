@@ -52,8 +52,7 @@ jobs:
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          flag-name: run-${{ join(matrix.*, '-') }}
-          parallel: true
+          parallel: false
 
       - name: Build
         run: cargo build -r --target ${{ matrix.target }} --locked

@@ -1818,7 +1818,8 @@ dependencies = [
 [[package]]
 name = "protontweaks-api"
 version = "0.1.0"
-source = "git+https://github.com/rain-cafe/protontweaks-api-rs?rev=c2d6fa41c0488e00e96578f99d34f21af8418127#c2d6fa41c0488e00e96578f99d34f21af8418127"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94f9ca867d555144d1c9593def9ed227661f61f28d2fe63835e4dc98026eed34"
 dependencies = [
  "log",
  "reqwest",
