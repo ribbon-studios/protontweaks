@@ -40,7 +40,7 @@ enum Commands {
     Setup(setup::CommandArgs),
     /// [experimental]: Runs the steam launch command and applies any necessary tweaks
     Run(run::CommandArgs),
-    /// Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
+    /// [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
     Watch,
 }
 
@@ -49,10 +49,12 @@ fn get_log_level() -> LevelFilter {
     LevelFilter::from_str(&default_level).unwrap_or(LevelFilter::Warn)
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     pretty_env_logger::formatted_builder()
         .filter(None, LevelFilter::Warn)
         .filter(Some("protontweaks"), get_log_level())
+        .filter(Some("protontweaks_api"), get_log_level())
         .init();
 
     let args = Cli::parse();
@@ -60,10 +62,10 @@ fn main() {
     let command = args.command.unwrap_or(Commands::Run(args.run));
 
     let result = match command {
-        Commands::List => list::command(),
-        Commands::Setup(args) => setup::command(args),
-        Commands::Run(args) => run::command(args),
-        Commands::Watch => watch::command(),
+        Commands::List => list::command().await,
+        Commands::Setup(args) => setup::command(args).await,
+        Commands::Run(args) => run::command(args).await,
+        Commands::Watch => watch::command().await,
     };
 
     if result.is_err() {

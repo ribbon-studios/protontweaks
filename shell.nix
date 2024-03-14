@@ -45,6 +45,7 @@ pkgs.mkShell {
   RUST_LOG = "trace";
 
   LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${ with pkgs; lib.makeLibraryPath [
+      vulkan-loader
       xorg.libX11
       xorg.libXcursor
       xorg.libXrandr

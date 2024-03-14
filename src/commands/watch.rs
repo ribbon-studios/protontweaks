@@ -5,7 +5,7 @@ use notify_debouncer_full::new_debouncer;
 
 use crate::utils::steam::Steam;
 
-pub fn command() -> Result<(), String> {
+pub async fn command() -> Result<(), String> {
     trace!("Running 'watch' command.");
     let (tx, rx) = std::sync::mpsc::channel();
     let steam = Steam::new();
@@ -61,7 +61,7 @@ fn map_launch_options() -> Box<dyn Fn(Option<String>) -> String> {
 
         if launch_options.contains(command) {
             launch_options
-        } else if launch_options == "" {
+        } else if launch_options.trim() == "" {
             command.to_string()
         } else {
             launch_options + " " + command

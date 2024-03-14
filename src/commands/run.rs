@@ -1,13 +1,11 @@
 use owo_colors::OwoColorize;
+use protontweaks_api::{app::App, Protontweaks};
 use std::{collections::HashMap, process::Command};
 
 use clap::Args;
 use regex::Regex;
 
-use crate::{
-    apps::{self, App},
-    utils::command,
-};
+use crate::{apps, utils::command};
 
 #[derive(Debug, Args)]
 pub struct CommandArgs {
@@ -15,11 +13,11 @@ pub struct CommandArgs {
     pub command_args: Option<Vec<String>>,
 }
 
-pub fn command(args: CommandArgs) -> Result<(), String> {
-    let (command, args, app) = parse_command(args)?;
+pub async fn command(args: CommandArgs) -> Result<(), String> {
+    let (command, args, app) = parse_command(args).await?;
 
-    if let Some(app) = &app {
-        let (app_tweaks_applied, app_total_tweaks) = apps::apply_safe(app);
+    let tweaks = if let Some(app) = &app {
+        let (app_tweaks_applied, app_total_tweaks) = apps::apply_safe(app).await;
 
         if app_tweaks_applied == 0 {
             println!(
@@ -33,9 +31,13 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
                 format!("{app_tweaks_applied} tweaks").bold()
             );
         }
-    }
 
-    let env = &app.map_or(HashMap::new(), |app| app.tweaks.env);
+        Some(app.flatten().await)
+    } else {
+        None
+    };
+
+    let env = &tweaks.map_or(HashMap::new(), |tweaks| tweaks.env);
 
     Command::new(command)
         .args(args)
@@ -48,7 +50,7 @@ pub fn command(args: CommandArgs) -> Result<(), String> {
     Ok(())
 }
 
-fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>), String> {
+async fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>), String> {
     let command_args = args.command_args.unwrap();
     let is_proton = command_args
         .iter()
@@ -65,7 +67,9 @@ fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>)
 
             println!("App ID: {0}", &caps["app_id"]);
 
-            apps::try_get(app_id).ok()
+            let api = Protontweaks::new();
+
+            api.try_app(app_id).await.ok()
         } else {
             warn!("Unable to detect App ID, acting purely as a passthrough...");
             None
@@ -83,11 +87,12 @@ fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>)
 pub mod tests {
     use super::{parse_command, CommandArgs};
 
-    #[test]
-    pub fn parse_command_should_support_simple_commands() {
+    #[tokio::test]
+    pub async fn parse_command_should_support_simple_commands() {
         let (command, args, app) = parse_command(CommandArgs {
             command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
         })
+        .await
         .expect("Failed to parse command.");
 
         assert_eq!(command, "echo");
@@ -95,11 +100,12 @@ pub mod tests {
         assert!(app.is_none(), "Expected app to not be defined!");
     }
 
-    #[test]
-    pub fn parse_command_should_support_unified_commands() {
+    #[tokio::test]
+    pub async fn parse_command_should_support_unified_commands() {
         let (command, args, app) = parse_command(CommandArgs {
             command_args: Some(vec!["echo hello".to_string()]),
         })
+        .await
         .expect("Failed to execute command.");
 
         assert_eq!(command, "echo");
@@ -107,8 +113,8 @@ pub mod tests {
         assert!(app.is_none(), "Expected app to not be defined!");
     }
 
-    #[test]
-    pub fn parse_command_should_support_steam_launch_commands() {
+    #[tokio::test]
+    pub async fn parse_command_should_support_steam_launch_commands() {
         let command_args = vec![
             "~/.local/share/Steam/ubuntu12_32/reaper",
             "SteamLaunch",
@@ -127,6 +133,7 @@ pub mod tests {
         let (command, args, app) = parse_command(CommandArgs {
             command_args: Some(command_args),
         })
+        .await
         .expect("Failed to execute command.");
 
         assert_eq!(command, "~/.local/share/Steam/ubuntu12_32/reaper");

@@ -1,6 +1,8 @@
-use std::{ffi::OsStr, process::Command};
+use std::ffi::OsStr;
 
-pub fn exec<I, S>(name: &'static str, args: I) -> Result<String, String>
+use async_process::Command;
+
+pub async fn exec<I, S>(name: &'static str, args: I) -> Result<String, String>
 where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
@@ -11,7 +13,7 @@ where
 
     trace!("Running command... {:?}", command);
 
-    match command.output() {
+    match command.output().await {
         Ok(output) => {
             if output.status.success() {
                 Ok(String::from_utf8(output.stdout).unwrap())

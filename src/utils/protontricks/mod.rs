@@ -1,32 +1,39 @@
 use std::ffi::OsStr;
 
+use futures::future;
+
 use super::nix_shell;
 
 pub mod install;
 pub mod list;
 
-fn protontricks<I, S>(args: I) -> Result<String, String>
+async fn protontricks<I, S>(args: I) -> Result<String, String>
 where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
 {
-    if is_installed() {
-        return super::command::exec("protontricks", args);
+    let (tricks_installed, nix_shell_installed) =
+        future::join(is_installed(), nix_shell::is_installed()).await;
+
+    if tricks_installed {
+        return super::command::exec("protontricks", args).await;
     }
 
-    if nix_shell::is_installed() {
+    if nix_shell_installed {
         return nix_shell::run("protontricks", args);
     }
 
     return Err("Please install 'nix-shell' or 'protontricks'!".to_string());
 }
 
-pub fn is_installed() -> bool {
-    super::command::exec("protontricks", ["--version"]).is_ok()
+pub async fn is_installed() -> bool {
+    super::command::exec("protontricks", ["--version"])
+        .await
+        .is_ok()
 }
 
-pub fn version() -> Result<String, String> {
-    protontricks(["--version"])
+pub async fn version() -> Result<String, String> {
+    protontricks(["--version"]).await
 }
 
 #[cfg(test)]
@@ -35,13 +42,13 @@ mod tests {
 
     use crate::utils::protontricks::{is_installed, version};
 
-    #[test]
-    fn version_should_return_the_version() {
-        assert_eq!(version().is_ok(), true);
+    #[tokio::test]
+    async fn version_should_return_the_version() {
+        assert_eq!(version().await.is_ok(), true);
     }
 
-    #[test]
-    fn is_installed_should_return_false_if_not_installed() {
-        assert_eq!(is_installed(), !env::var("CI").is_ok());
+    #[tokio::test]
+    async fn is_installed_should_return_false_if_not_installed() {
+        assert_eq!(is_installed().await, !env::var("CI").is_ok());
     }
 }
