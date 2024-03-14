@@ -2,3 +2,5 @@
 /result
 *.vdf
 lcov.info
+*.deb
+*.rpm

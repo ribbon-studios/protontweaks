@@ -63,6 +63,12 @@ jobs:
           cargo install cargo-deb
           cargo deb -o protontweaks.deb
 
+      - name: Build RPM (linux)
+        if: matrix.build == 'linux'
+        run: |
+          cargo install cargo-generate-rpm
+          cargo generate-rpm -o protontweaks.rpm
+
       - name: Rename Binaries (linux / macos)
         if: matrix.build != 'windows'
         run: mv target/${{ matrix.target }}/release/protontweaks target/${{ matrix.target }}/release/protontweaks-${{ matrix.target }}
@@ -74,6 +80,7 @@ jobs:
             target/${{ matrix.target }}/release/protontweaks.exe
             target/${{ matrix.target }}/release/protontweaks-${{ matrix.target }}
             protontweaks.deb
+            protontweaks.rpm
 
       - name: Upload the binaries
         uses: softprops/action-gh-release@v1
@@ -83,3 +90,4 @@ jobs:
             target/${{ matrix.target }}/release/protontweaks.exe
             target/${{ matrix.target }}/release/protontweaks-${{ matrix.target }}
             protontweaks.deb
+            protontweaks.rpm
