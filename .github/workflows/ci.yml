@@ -49,10 +49,9 @@ jobs:
       - name: Generate code coverage
         run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2
+      - uses: codecov/codecov-action@v4.0.1
         with:
-          parallel: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Build
         run: cargo build -r --target ${{ matrix.target }} --locked
