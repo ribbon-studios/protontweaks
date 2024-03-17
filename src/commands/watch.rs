@@ -59,12 +59,22 @@ fn map_launch_options() -> Box<dyn Fn(Option<String>) -> String> {
 
         let command = "protontweaks %command%";
 
+        // If our command has already been added then just return the original value
         if launch_options.contains(command) {
-            launch_options
-        } else if launch_options.trim() == "" {
-            command.to_string()
-        } else {
-            launch_options + " " + command
+            return launch_options;
         }
+
+        // If %command% has already been added, but protontweaks hasn't prefix it with protontweaks
+        if launch_options.contains("%command%") {
+            return launch_options.replace("%command%", command);
+        }
+
+        // If launch options is empty then just return our command
+        if launch_options.trim() == "" {
+            return command.to_string();
+        }
+
+        // Otherwise append our command as a fallback
+        launch_options + " " + command
     });
 }
