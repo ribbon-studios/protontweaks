@@ -1,11 +1,14 @@
 use owo_colors::OwoColorize;
-use protontweaks_api::{app::App, Protontweaks};
+use protontweaks_api::{app::App, system::SystemTweaks, Protontweaks};
 use std::{collections::HashMap, process::Command};
 
 use clap::Args;
 use regex::Regex;
 
-use crate::{apps, utils::command};
+use crate::{
+    apps,
+    utils::{command, gamemode},
+};
 
 #[derive(Debug, Args)]
 pub struct CommandArgs {
@@ -14,9 +17,9 @@ pub struct CommandArgs {
 }
 
 pub async fn command(args: CommandArgs) -> Result<(), String> {
-    let (command, args, app) = parse_command(args).await?;
+    let (command, args, app, system_tweaks) = parse_command(args).await?;
 
-    let tweaks = if let Some(app) = &app {
+    if let Some(app) = &app {
         let (app_tweaks_applied, app_total_tweaks) = apps::apply_safe(app).await;
 
         if app_tweaks_applied == 0 {
@@ -31,17 +34,17 @@ pub async fn command(args: CommandArgs) -> Result<(), String> {
                 format!("{app_tweaks_applied} tweaks").bold()
             );
         }
+    }
 
-        Some(app.flatten().await)
-    } else {
-        None
-    };
+    let env = &system_tweaks.map_or(HashMap::new(), |tweaks| tweaks.env);
 
-    let env = &tweaks.map_or(HashMap::new(), |tweaks| tweaks.env);
+    let mut command = Command::new(command);
 
-    Command::new(command)
-        .args(args)
-        .envs(env)
+    command.args(args).envs(env);
+
+    info!("Starting app... {:?}", command);
+
+    command
         .spawn()
         .expect("Failed to run command")
         .wait()
@@ -50,7 +53,9 @@ pub async fn command(args: CommandArgs) -> Result<(), String> {
     Ok(())
 }
 
-async fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option<App>), String> {
+async fn parse_command(
+    args: CommandArgs,
+) -> Result<(String, Vec<String>, Option<App>, Option<SystemTweaks>), String> {
     let command_args = args.command_args.unwrap();
     let is_proton = command_args
         .iter()
@@ -79,8 +84,26 @@ async fn parse_command(args: CommandArgs) -> Result<(String, Vec<String>, Option
         None
     };
 
-    let command = command::split(&command)?;
-    return Ok((command[0].clone(), command[1..].to_vec(), app));
+    let mut command = command::split(&command)?;
+
+    let tweaks = if let Some(app) = &app {
+        Some(app.flatten().await)
+    } else {
+        None
+    };
+
+    if let Some(tweaks) = &tweaks {
+        // TODO: Add config support before enabling this
+        // if tweaks.settings.mangohud.unwrap_or(false) && mangohud::is_installed().await {
+        //     args.splice(0..0, vec!["mangohud".to_string()]);
+        // }
+
+        if tweaks.settings.gamemode.unwrap_or(true) && gamemode::is_installed().await {
+            command.splice(0..0, vec!["gamemoderun".to_string()]);
+        }
+    }
+
+    return Ok((command[0].clone(), command[1..].to_vec(), app, tweaks));
 }
 
 #[cfg(test)]
@@ -89,7 +112,7 @@ pub mod tests {
 
     #[tokio::test]
     pub async fn parse_command_should_support_simple_commands() {
-        let (command, args, app) = parse_command(CommandArgs {
+        let (command, args, app, system_tweaks) = parse_command(CommandArgs {
             command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
         })
         .await
@@ -98,11 +121,15 @@ pub mod tests {
         assert_eq!(command, "echo");
         assert_eq!(args, vec!["hello"]);
         assert!(app.is_none(), "Expected app to not be defined!");
+        assert!(
+            system_tweaks.is_none(),
+            "Expected systemTweaks to not be defined!"
+        );
     }
 
     #[tokio::test]
     pub async fn parse_command_should_support_unified_commands() {
-        let (command, args, app) = parse_command(CommandArgs {
+        let (command, args, app, system_tweaks) = parse_command(CommandArgs {
             command_args: Some(vec!["echo hello".to_string()]),
         })
         .await
@@ -111,6 +138,10 @@ pub mod tests {
         assert_eq!(command, "echo");
         assert_eq!(args, vec!["hello"]);
         assert!(app.is_none(), "Expected app to not be defined!");
+        assert!(
+            system_tweaks.is_none(),
+            "Expected systemTweaks to not be defined!"
+        );
     }
 
     #[tokio::test]
@@ -130,7 +161,7 @@ pub mod tests {
             "'/home/ceci/.local/share/Steam/steamapps/common/They Are Billions/TheyAreBillions.exe'"
         ].iter_mut().map(|x| x.to_string()).collect::<Vec<String>>();
 
-        let (command, args, app) = parse_command(CommandArgs {
+        let (command, args, app, system_tweaks) = parse_command(CommandArgs {
             command_args: Some(command_args),
         })
         .await
@@ -143,5 +174,10 @@ pub mod tests {
 
         assert_eq!(app.tweaks.env.len(), 0);
         assert_eq!(app.tweaks.tricks.len(), 1);
+
+        let system_tweaks = system_tweaks.unwrap();
+
+        assert_eq!(system_tweaks.env.len(), app.tweaks.env.len());
+        assert_eq!(system_tweaks.tricks.len(), app.tweaks.tricks.len());
     }
 }
