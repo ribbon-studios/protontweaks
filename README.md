@@ -18,7 +18,13 @@
 
 ### Installation
 
-We provide a [binary and deb package](https://github.com/rain-cafe/protontweaks/releases/latest) for installation on platforms that don't have nix.
+This will automatically install protontweaks with your systems package manager if its available
+
+```sh
+$ curl -fsSL https://protontweaks.com/install.sh | bash
+```
+
+#### NixOS
 
 <details>
   <summary>NixOS Flake Example</summary>
@@ -72,27 +78,20 @@ We provide a [binary and deb package](https://github.com/rain-cafe/protontweaks/
 
 ### Usage
 
+#### Automatic
+
+This installs a systemd service that automatically updates your launch options when you install a game.
+
 ```sh
-$ protontweaks --help
+$ protontweaks service --install
+```
 
-Crowdsourced tweaks for Steam!
+#### Manual
 
-Usage: protontweaks [COMMAND_ARGS]...
-       protontweaks <COMMAND>
+Add the following to the launch options for a steam game!
 
-Commands:
-  list     Lists the apps installed on Steam
-  service  Register or Unregister the watch service
-  run      [experimental]: Runs the steam launch command and applies any necessary tweaks
-  watch    [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
-  help     Print this message or the help of the given subcommand(s)
-
-Arguments:
-  [COMMAND_ARGS]...  The steam launch command '%command%'
-
-Options:
-  -h, --help     Print help
-  -V, --version  Print version
+```sh
+protontweaks %command%
 ```
 
 [github-actions-image]: https://img.shields.io/github/actions/workflow/status/rain-cafe/protontweaks/ci.yml?event=push
