@@ -4,7 +4,7 @@ extern crate log;
 use std::{env, str::FromStr};
 
 use clap::{Parser, Subcommand};
-use commands::{list, run, setup, watch};
+use commands::{list, run, service, watch};
 use log::LevelFilter;
 
 pub mod apps;
@@ -36,8 +36,8 @@ struct Cli {
 enum Commands {
     /// Lists the apps installed on Steam
     List,
-    /// Applies any necessary tweaks to a given game
-    Setup(setup::CommandArgs),
+    /// Register or Unregister the watch service
+    Service(service::CommandArgs),
     /// [experimental]: Runs the steam launch command and applies any necessary tweaks
     Run(run::CommandArgs),
     /// [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
@@ -63,7 +63,7 @@ async fn main() {
 
     let result = match command {
         Commands::List => list::command().await,
-        Commands::Setup(args) => setup::command(args).await,
+        Commands::Service(args) => service::command(args).await,
         Commands::Run(args) => run::command(args).await,
         Commands::Watch => watch::command().await,
     };

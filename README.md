@@ -75,17 +75,17 @@ We provide a [binary and deb package](https://github.com/rain-cafe/protontweaks/
 ```sh
 $ protontweaks --help
 
-crowdsourced protontricks
+Crowdsourced tweaks for Steam!
 
 Usage: protontweaks [COMMAND_ARGS]...
        protontweaks <COMMAND>
 
 Commands:
-  list   Lists the apps installed on Steam
-  setup  Applies any necessary tweaks to a given game
-  run    [experimental]: Runs the steam launch command and applies any necessary tweaks
-  watch  [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
-  help   Print this message or the help of the given subcommand(s)
+  list     Lists the apps installed on Steam
+  service  Register or Unregister the watch service
+  run      [experimental]: Runs the steam launch command and applies any necessary tweaks
+  watch    [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
+  help     Print this message or the help of the given subcommand(s)
 
 Arguments:
   [COMMAND_ARGS]...  The steam launch command '%command%'
