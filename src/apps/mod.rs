@@ -1,6 +1,6 @@
 use protontweaks_api::app::App;
 
-use crate::utils::protontricks;
+use crate::utils::commands::protontricks::Protontricks;
 
 /// Applies the app and returns a result of whether it was successful
 pub async fn try_apply(app: &App) -> Result<(u32, u32), String> {
@@ -13,7 +13,7 @@ pub async fn try_apply(app: &App) -> Result<(u32, u32), String> {
     }
 
     trace!("Installing tricks for {} -> {}", app.id, app.name);
-    let tweaks_applied = protontricks::install::components(&app.id, &tweaks.tricks).await?;
+    let tweaks_applied = Protontricks::install_components(&app.id, &tweaks.tricks).await?;
 
     return Ok((tweaks_applied, tweaks.tricks.len().try_into().unwrap()));
 }

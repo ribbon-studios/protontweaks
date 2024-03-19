@@ -122,7 +122,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn parse_command_should_support_simple_commands() {
         let (command, args, app, system_tweaks) = parse_command(
-            Config::default(),
+            Config::off(),
             CommandArgs {
                 command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
             },
@@ -142,7 +142,7 @@ pub mod tests {
     #[tokio::test]
     pub async fn parse_command_should_support_unified_commands() {
         let (command, args, app, system_tweaks) = parse_command(
-            Config::default(),
+            Config::off(),
             CommandArgs {
                 command_args: Some(vec!["echo hello".to_string()]),
             },
@@ -177,7 +177,7 @@ pub mod tests {
         ].iter_mut().map(|x| x.to_string()).collect::<Vec<String>>();
 
         let (command, args, app, system_tweaks) = parse_command(
-            Config::default(),
+            Config::off(),
             CommandArgs {
                 command_args: Some(command_args),
             },
@@ -185,9 +185,8 @@ pub mod tests {
         .await
         .expect("Failed to execute command.");
 
-        assert_eq!(command, "gamemoderun");
-        assert_eq!(args[0], "~/.local/share/Steam/ubuntu12_32/reaper");
-        assert_eq!(args.len(), 12);
+        assert_eq!(command, "~/.local/share/Steam/ubuntu12_32/reaper");
+        assert_eq!(args.len(), 11);
 
         let app = app.unwrap();
 

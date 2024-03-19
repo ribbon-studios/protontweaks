@@ -10,6 +10,15 @@ pub struct Config {
     pub mangohud: bool,
 }
 
+impl Config {
+    pub fn off() -> Self {
+        Self {
+            gamemode: false,
+            mangohud: false,
+        }
+    }
+}
+
 impl Default for Config {
     fn default() -> Self {
         Self {
