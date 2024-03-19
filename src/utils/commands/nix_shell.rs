@@ -5,7 +5,7 @@ use std::{
 
 use super::CLI;
 
-pub struct NixShell {}
+pub struct NixShell;
 
 impl NixShell {
     pub fn run<I, S>(program: &str, args: I) -> Result<String, String>
