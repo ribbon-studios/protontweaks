@@ -1,7 +1,8 @@
 { pkgs, lib, fetchFromGitHub, rustPlatform, pkg-config, openssl }:
 
 let
-  version = "0.1.0";
+  cargo = lib.importTOML ../../Cargo.toml;
+  version = cargo.package.version;
 in
 rustPlatform.buildRustPackage {
   pname = "protontweaks";

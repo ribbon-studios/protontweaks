@@ -94,6 +94,25 @@ Add the following to the launch options for a steam game!
 protontweaks %command%
 ```
 
+### Configuration
+
+We attempt to load a configuration file from the following locations, from highest to lowest priority:
+
+1. `$XDG_CONFIG_HOME/protontweaks.json`
+2. `$HOME/.config/protontweaks.json`
+3. `/etc/protontweaks.json`
+
+```jsonc
+{
+  // Whether to automatically run games with gamemoderun (if installed and supported)
+  // Default: true
+  "gamemode": true,
+  // Whether to automatically run games with mangohud (if installed and supported)
+  // Default: false
+  "mangohud": true
+}
+```
+
 [github-actions-image]: https://img.shields.io/github/actions/workflow/status/rain-cafe/protontweaks/ci.yml?event=push
 [github-actions-url]: https://github.com/rain-cafe/protontweaks/actions/workflows/ci.yml?query=branch%3Amain
 [coverage-image]: https://img.shields.io/codecov/c/github/rain-cafe/protontweaks

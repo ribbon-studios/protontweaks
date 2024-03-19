@@ -9,6 +9,7 @@ use log::LevelFilter;
 
 pub mod apps;
 pub mod commands;
+pub mod config;
 pub mod utils;
 
 static VERSION_LONG: &str = concat!(
@@ -57,6 +58,8 @@ async fn main() {
         .filter(Some("protontweaks_api"), get_log_level())
         .init();
 
+    let config = config::load();
+
     let args = Cli::parse();
 
     let command = args.command.unwrap_or(Commands::Run(args.run));
@@ -64,7 +67,7 @@ async fn main() {
     let result = match command {
         Commands::List => list::command().await,
         Commands::Service(args) => service::command(args).await,
-        Commands::Run(args) => run::command(args).await,
+        Commands::Run(args) => run::command(config, args).await,
         Commands::Watch => watch::command().await,
     };
 

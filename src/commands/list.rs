@@ -1,13 +1,13 @@
 use futures::future;
 use protontweaks_api::Protontweaks;
 
-use crate::utils::protontricks;
+use crate::utils::commands::protontricks::Protontricks;
 
 pub async fn command() -> Result<(), String> {
     println!("Fetching installed apps...");
     let api = Protontweaks::new();
 
-    let (installed_app_ids, apps) = future::join(protontricks::list::apps(), api.apps()).await;
+    let (installed_app_ids, apps) = future::join(Protontricks::apps(), api.apps()).await;
 
     let apps = apps
         .iter()
