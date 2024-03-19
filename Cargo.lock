@@ -1881,7 +1881,7 @@ checksum = "43d84d1d7a6ac92673717f9f6d1518374ef257669c24ebc5ac25d5033828be58"
 
 [[package]]
 name = "protontweaks"
-version = "0.5.1"
+version = "0.6.0"
 dependencies = [
  "async-process",
  "chrono",
