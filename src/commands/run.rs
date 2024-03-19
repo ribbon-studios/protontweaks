@@ -7,7 +7,8 @@ use regex::Regex;
 
 use crate::{
     apps,
-    utils::{command, gamemode},
+    config::Config,
+    utils::{command, gamemode, mangohud},
 };
 
 #[derive(Debug, Args)]
@@ -16,8 +17,8 @@ pub struct CommandArgs {
     pub command_args: Option<Vec<String>>,
 }
 
-pub async fn command(args: CommandArgs) -> Result<(), String> {
-    let (command, args, app, system_tweaks) = parse_command(args).await?;
+pub async fn command(config: Config, args: CommandArgs) -> Result<(), String> {
+    let (command, args, app, system_tweaks) = parse_command(config, args).await?;
 
     if let Some(app) = &app {
         let (app_tweaks_applied, app_total_tweaks) = apps::apply_safe(app).await;
@@ -54,6 +55,7 @@ pub async fn command(args: CommandArgs) -> Result<(), String> {
 }
 
 async fn parse_command(
+    config: Config,
     args: CommandArgs,
 ) -> Result<(String, Vec<String>, Option<App>, Option<SystemTweaks>), String> {
     let command_args = args.command_args.unwrap();
@@ -93,12 +95,17 @@ async fn parse_command(
     };
 
     if let Some(tweaks) = &tweaks {
-        // TODO: Add config support before enabling this
-        // if tweaks.settings.mangohud.unwrap_or(false) && mangohud::is_installed().await {
-        //     args.splice(0..0, vec!["mangohud".to_string()]);
-        // }
+        if config.mangohud
+            && tweaks.settings.mangohud.unwrap_or(false)
+            && mangohud::is_installed().await
+        {
+            command.splice(0..0, vec!["mangohud".to_string()]);
+        }
 
-        if tweaks.settings.gamemode.unwrap_or(true) && gamemode::is_installed().await {
+        if config.gamemode
+            && tweaks.settings.gamemode.unwrap_or(true)
+            && gamemode::is_installed().await
+        {
             command.splice(0..0, vec!["gamemoderun".to_string()]);
         }
     }
@@ -108,13 +115,18 @@ async fn parse_command(
 
 #[cfg(test)]
 pub mod tests {
+    use crate::config::Config;
+
     use super::{parse_command, CommandArgs};
 
     #[tokio::test]
     pub async fn parse_command_should_support_simple_commands() {
-        let (command, args, app, system_tweaks) = parse_command(CommandArgs {
-            command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
-        })
+        let (command, args, app, system_tweaks) = parse_command(
+            Config::default(),
+            CommandArgs {
+                command_args: Some(vec!["echo".to_string(), "hello".to_string()]),
+            },
+        )
         .await
         .expect("Failed to parse command.");
 
@@ -129,9 +141,12 @@ pub mod tests {
 
     #[tokio::test]
     pub async fn parse_command_should_support_unified_commands() {
-        let (command, args, app, system_tweaks) = parse_command(CommandArgs {
-            command_args: Some(vec!["echo hello".to_string()]),
-        })
+        let (command, args, app, system_tweaks) = parse_command(
+            Config::default(),
+            CommandArgs {
+                command_args: Some(vec!["echo hello".to_string()]),
+            },
+        )
         .await
         .expect("Failed to execute command.");
 
@@ -161,14 +176,18 @@ pub mod tests {
             "'/home/ceci/.local/share/Steam/steamapps/common/They Are Billions/TheyAreBillions.exe'"
         ].iter_mut().map(|x| x.to_string()).collect::<Vec<String>>();
 
-        let (command, args, app, system_tweaks) = parse_command(CommandArgs {
-            command_args: Some(command_args),
-        })
+        let (command, args, app, system_tweaks) = parse_command(
+            Config::default(),
+            CommandArgs {
+                command_args: Some(command_args),
+            },
+        )
         .await
         .expect("Failed to execute command.");
 
-        assert_eq!(command, "~/.local/share/Steam/ubuntu12_32/reaper");
-        assert_eq!(args.len(), 11);
+        assert_eq!(command, "gamemoderun");
+        assert_eq!(args[0], "~/.local/share/Steam/ubuntu12_32/reaper");
+        assert_eq!(args.len(), 12);
 
         let app = app.unwrap();
 
