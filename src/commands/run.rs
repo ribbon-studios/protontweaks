@@ -108,6 +108,10 @@ async fn parse_command(
         {
             command.splice(0..0, vec!["gamemoderun".to_string()]);
         }
+
+        if tweaks.args.len() > 0 {
+            command.extend(tweaks.args.clone());
+        }
     }
 
     return Ok((command[0].clone(), command[1..].to_vec(), app, tweaks));
