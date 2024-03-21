@@ -4,7 +4,7 @@ extern crate log;
 use std::{env, str::FromStr};
 
 use clap::{Parser, Subcommand};
-use commands::{list, run, service, watch};
+use commands::{list, run, setup, uninstall, watch};
 use log::LevelFilter;
 use protontweaks_api::Protontweaks;
 
@@ -34,11 +34,13 @@ enum Commands {
     /// Lists the apps installed on Steam
     List,
     /// Register or Unregister the watch service
-    Service(service::CommandArgs),
+    Setup,
     /// [experimental]: Runs the steam launch command and applies any necessary tweaks
     Run(run::CommandArgs),
     /// [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
     Watch,
+    /// Uninstalls the protontweaks service and deletes any configs
+    Uninstall,
 }
 
 fn get_log_level() -> LevelFilter {
@@ -62,9 +64,10 @@ async fn main() {
 
     let result = match command {
         Commands::List => list::command().await,
-        Commands::Service(args) => service::command(args).await,
+        Commands::Setup => setup::command().await,
         Commands::Run(args) => run::command(config, args).await,
         Commands::Watch => watch::command().await,
+        Commands::Uninstall => uninstall::command().await,
     };
 
     if result.is_err() {

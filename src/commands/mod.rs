@@ -1,4 +1,5 @@
 pub mod list;
 pub mod run;
-pub mod service;
+pub mod setup;
+pub mod uninstall;
 pub mod watch;
