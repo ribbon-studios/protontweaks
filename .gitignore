@@ -4,3 +4,5 @@
 lcov.info
 *.deb
 *.rpm
+.protontweaks.json
+tests/.configs/

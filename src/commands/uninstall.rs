@@ -1,6 +1,6 @@
 use owo_colors::OwoColorize;
 
-use crate::{config::wipe, utils::service::unregister};
+use crate::{config::Config, utils::service::unregister};
 
 pub async fn command() -> Result<(), String> {
     println!(
@@ -21,7 +21,7 @@ pub async fn command() -> Result<(), String> {
     }
 
     println!("{}", "[configs] -> cleaning up...");
-    wipe();
+    Config::wipe()?;
     println!("{}", "[configs] -> cleaned up successfully!".green());
 
     Ok(())

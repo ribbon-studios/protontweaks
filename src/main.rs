@@ -3,8 +3,8 @@ extern crate pretty_env_logger;
 extern crate log;
 use std::{env, str::FromStr};
 
-use clap::{Parser, Subcommand};
-use commands::{list, run, setup, uninstall, watch};
+use clap::Parser;
+use commands::{run, Command};
 use log::LevelFilter;
 use protontweaks_api::Protontweaks;
 
@@ -23,24 +23,10 @@ pub const API: Protontweaks = Protontweaks::new_with_url(env!("PROTONTWEAKS_API"
 #[command(args_conflicts_with_subcommands = true)]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Option<Command>,
 
     #[command(flatten)]
     run: run::CommandArgs,
-}
-
-#[derive(Debug, Subcommand)]
-enum Commands {
-    /// Lists the apps installed on Steam
-    List,
-    /// Register or Unregister the watch service
-    Setup,
-    /// [experimental]: Runs the steam launch command and applies any necessary tweaks
-    Run(run::CommandArgs),
-    /// [experimental]: Watches for any steam apps to be installed and automatically adds 'protontweaks' to the launch options
-    Watch,
-    /// Uninstalls the protontweaks service and deletes any configs
-    Uninstall,
 }
 
 fn get_log_level() -> LevelFilter {
@@ -56,24 +42,11 @@ async fn main() {
         .filter(Some("protontweaks_api"), get_log_level())
         .init();
 
-    let config = config::load();
-
     let args = Cli::parse();
 
-    let command = args.command.unwrap_or(Commands::Run(args.run));
+    let command = args.command.unwrap_or(Command::Run(args.run));
 
-    let result = match command {
-        Commands::List => list::command().await,
-        Commands::Setup => setup::command().await,
-        Commands::Run(args) => run::command(config, args).await,
-        Commands::Watch => watch::command().await,
-        Commands::Uninstall => uninstall::command().await,
-    };
-
-    if result.is_err() {
-        #[allow(unused_must_use)]
-        {
-            error!("{0}", result.unwrap_err());
-        }
+    if let Err(error) = commands::handle(command).await {
+        error!("{0}", error);
     }
 }

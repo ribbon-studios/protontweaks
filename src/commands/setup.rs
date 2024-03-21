@@ -1,10 +1,7 @@
 use cli_prompts_rs::CliPrompt;
 use owo_colors::OwoColorize;
 
-use crate::{
-    config::{detect_valid_home, try_save, Config},
-    utils::service::register,
-};
+use crate::{config::Config, utils::service::register};
 
 pub async fn command() -> Result<(), String> {
     println!("{}", "~ Protontweaks Setup ~".blue().bold());
@@ -47,8 +44,13 @@ pub async fn command() -> Result<(), String> {
             )
             .map_err(|e| e.to_string())?;
 
-        let home = detect_valid_home()?;
-        try_save(&home, &Config { gamemode, mangohud })?;
+        let home = Config::discover_valid_home()?;
+
+        let mut config = Config::default();
+        config.gamemode = gamemode;
+        config.mangohud = mangohud;
+
+        config.save_at(&home)?;
         cli_prompt
             .print_note(format!("Config saved to '{home}'!").as_str())
             .map_err(|e| e.to_string())?;
