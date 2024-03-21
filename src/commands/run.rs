@@ -1,5 +1,5 @@
 use owo_colors::OwoColorize;
-use protontweaks_api::{app::App, system::SystemTweaks, Protontweaks};
+use protontweaks_api::{app::App, system::SystemTweaks};
 use std::{collections::HashMap, process::Command};
 
 use clap::Args;
@@ -9,6 +9,7 @@ use crate::{
     apps,
     config::Config,
     utils::{command, gamemode, mangohud},
+    API,
 };
 
 #[derive(Debug, Args)]
@@ -74,9 +75,7 @@ async fn parse_command(
 
             println!("App ID: {0}", &caps["app_id"]);
 
-            let api = Protontweaks::new();
-
-            api.try_app(app_id).await.ok()
+            API.try_app(app_id).await.ok()
         } else {
             warn!("Unable to detect App ID, acting purely as a passthrough...");
             None

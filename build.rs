@@ -14,8 +14,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         chrono::Utc::now().format("%Y-%m-%d @ %H:%M")
     );
     println!(
-        "cargo:rustc-env=PROTONTWEAKS_DB={}",
-        "https://api.protontweaks.com/v3"
+        "cargo:rustc-env=PROTONTWEAKS_API={}",
+        "https://api.protontweaks.com/v4"
     );
     Ok(())
 }

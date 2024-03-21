@@ -6,20 +6,16 @@ use std::{env, str::FromStr};
 use clap::{Parser, Subcommand};
 use commands::{list, run, service, watch};
 use log::LevelFilter;
+use protontweaks_api::Protontweaks;
 
 pub mod apps;
 pub mod commands;
 pub mod config;
 pub mod utils;
 
-static VERSION_LONG: &str = concat!(
-    env!("CARGO_PKG_VERSION"),
-    // "@",
-    // env!("GIT_SHORT_HASH"),
-    " (",
-    env!("COMPILE_TIME"),
-    ")"
-);
+static VERSION_LONG: &str = concat!(env!("CARGO_PKG_VERSION"), " (", env!("COMPILE_TIME"), ")");
+
+pub const API: Protontweaks = Protontweaks::new_with_url(env!("PROTONTWEAKS_API"));
 
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
