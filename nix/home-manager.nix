@@ -22,6 +22,7 @@ in
   options.services.protontweaks.config = mkOption {
     description = "The protontweaks config";
     type = nullOr (protontweaksConfig);
+    default = null;
   };
 
   config = mkIf (cfg.config != null) {
