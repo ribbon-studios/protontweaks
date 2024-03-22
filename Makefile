@@ -9,3 +9,7 @@ validate:
 	killall steam && sleep 5 || true
 	nix build
 	nix shell --command steam
+
+validate-appimage:
+	cargo appimage
+	appimage-run ./target/appimage/protontweaks.AppImage --version

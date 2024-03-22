@@ -6,3 +6,4 @@ lcov.info
 *.rpm
 .protontweaks.json
 tests/.configs/
+icon.png

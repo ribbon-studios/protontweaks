@@ -29,7 +29,16 @@ jobs:
         if: matrix.build == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libssl-dev
+          sudo apt-get install -y libssl-dev desktop-file-utils zsync libfuse2
+
+      - name: Download AppImageKit
+        run: |
+          curl -L https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -o ./appimagetool.AppImage
+          chmod +x ./appimagetool.AppImage
+          mkdir -p $HOME/.local/bin
+          mv ./appimagetool.AppImage $HOME/.local/bin/appimagetool
+
+      # /home/runner/.local/bin
 
       - uses: cachix/install-nix-action@v18
         with:
@@ -56,17 +65,20 @@ jobs:
       - name: Build
         run: cargo build -r --target ${{ matrix.target }} --locked
 
+      - name: Install Cargo Tools
+        run: cargo install cargo-deb cargo-generate-rpm cargo-appimage
+
       - name: Build Deb (linux)
         if: matrix.build == 'linux'
-        run: |
-          cargo install cargo-deb
-          cargo deb -o protontweaks.deb
+        run: cargo deb -o protontweaks.deb
 
       - name: Build RPM (linux)
         if: matrix.build == 'linux'
-        run: |
-          cargo install cargo-generate-rpm
-          cargo generate-rpm -o protontweaks.rpm
+        run: cargo generate-rpm -o protontweaks.rpm
+
+      - name: Build AppImage (linux)
+        if: matrix.build == 'linux'
+        run: cargo appimage
 
       - name: Rename Binaries (linux / macos)
         if: matrix.build != 'windows'
@@ -78,6 +90,7 @@ jobs:
           path: |
             target/${{ matrix.target }}/release/protontweaks.exe
             target/${{ matrix.target }}/release/protontweaks-${{ matrix.target }}
+            target/appimage/protontweaks.AppImage
             protontweaks.deb
             protontweaks.rpm
 
@@ -88,5 +101,6 @@ jobs:
           files: |
             target/${{ matrix.target }}/release/protontweaks.exe
             target/${{ matrix.target }}/release/protontweaks-${{ matrix.target }}
+            target/appimage/protontweaks.AppImage
             protontweaks.deb
             protontweaks.rpm
