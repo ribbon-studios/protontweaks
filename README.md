@@ -20,7 +20,7 @@
 This will automatically install protontweaks with your systems package manager if its available
 
 ```sh
-$ curl -fsSL https://protontweaks.com/install.sh | bash
+$ bash -c "$(curl -fsSL https://protontweaks.com/install.sh)"
 ```
 
 #### NixOS
