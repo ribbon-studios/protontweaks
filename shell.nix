@@ -15,6 +15,8 @@ let
     gcc
     rustfmt
     clippy
+    appimagekit
+    appimage-run
   ];
 
   system = {
