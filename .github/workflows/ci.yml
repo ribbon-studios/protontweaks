@@ -38,10 +38,6 @@ jobs:
           mkdir -p $HOME/.local/bin
           mv ./appimagetool.AppImage $HOME/.local/bin/appimagetool
 
-      - uses: cachix/install-nix-action@v18
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:

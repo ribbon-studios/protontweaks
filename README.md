@@ -13,8 +13,7 @@
 
 ### Requirements
 
-- `protontricks` or `nix-shell`
-  - If `nix-shell` is installed then we'll utilize it to temporarily install `protontricks`!
+- [`protontricks`](https://github.com/Matoking/protontricks)
 
 ### Installation
 

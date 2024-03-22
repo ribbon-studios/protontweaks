@@ -2,7 +2,6 @@ use std::ffi::OsStr;
 
 use async_process::Command;
 
-pub mod nix_shell;
 pub mod protontricks;
 
 pub trait CLI {

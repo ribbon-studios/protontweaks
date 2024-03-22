@@ -1,8 +1,6 @@
 use std::ffi::OsStr;
 
-use futures::future;
-
-use super::{nix_shell::NixShell, CLI};
+use super::CLI;
 
 pub mod install;
 pub mod list;
@@ -14,18 +12,11 @@ impl CLI for Protontricks {
         I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
-        let (tricks_installed, nix_shell_installed) =
-            future::join(Self::is_installed(), NixShell::is_installed()).await;
-
-        if tricks_installed {
+        if Self::is_installed().await {
             return super::exec("protontricks", args).await;
         }
 
-        if nix_shell_installed {
-            return NixShell::run("protontricks", args);
-        }
-
-        return Err("Please install 'nix-shell' or 'protontricks'!".to_string());
+        return Err("Please install 'protontricks'!".to_string());
     }
 
     async fn is_installed() -> bool {
