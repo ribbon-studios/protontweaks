@@ -20,6 +20,16 @@
       # deprecated in Nix 2.8
       nixosModule = self.nixosModules.default;
 
+      homeManagerModules =
+        let
+          protontweaks = import ./nix/home-manager.nix;
+        in
+        {
+          protontweaks = protontweaks;
+          default = protontweaks;
+        };
+      homeManagerModule = self.homeManagerModules.default;
+
       overlay = final: prev: {
         protontweaks = prev.callPackage ./nix/pkgs/protontweaks.nix { };
       };
