@@ -37,16 +37,17 @@ let
 
   buildInputs = inputs ++ systemInputs;
 in
-pkgs.mkShell {
-  packages = [ llvmPackages.bintools ];
-  inherit buildInputs;
+{
+  default = pkgs.mkShell {
+    packages = [ llvmPackages.bintools ];
+    inherit buildInputs;
 
-  RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
-  LLVM_COV = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-cov";
-  LLVM_PROFDATA = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-profdata";
-  RUST_LOG = "trace";
+    RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+    LLVM_COV = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-cov";
+    LLVM_PROFDATA = "${pkgs.rustc.llvmPackages.llvm}/bin/llvm-profdata";
+    RUST_LOG = "trace";
 
-  LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${ with pkgs; lib.makeLibraryPath [
+    LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${ with pkgs; lib.makeLibraryPath [
       vulkan-loader
       xorg.libX11
       xorg.libXcursor
@@ -56,5 +57,6 @@ pkgs.mkShell {
       wayland
       libxkbcommon
       fontconfig
-  ] }";
+    ] }";
+  };
 }

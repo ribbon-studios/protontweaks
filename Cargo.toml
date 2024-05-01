@@ -22,7 +22,7 @@ notify-debouncer-full = "0.3.1"
 os_info = "3.8.1"
 owo-colors = "4.0.0"
 pretty_env_logger = "0.5.0"
-protontweaks-api = "0.3.1"
+protontweaks-api = "0.4.1"
 regex = "1.10.3"
 rust_search = "2.1.0"
 serde = { version = "1.0.197", features = ["derive"] }

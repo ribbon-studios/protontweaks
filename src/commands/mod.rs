@@ -2,6 +2,7 @@ use clap::Subcommand;
 
 use crate::config::Config;
 
+pub mod info;
 pub mod list;
 pub mod run;
 pub mod setup;
@@ -20,6 +21,8 @@ pub enum Command {
     Watch,
     /// Uninstalls the protontweaks service and deletes any configs
     Uninstall,
+    /// Outputs information about the system
+    Info,
 }
 
 pub async fn handle(command: Command) -> Result<(), String> {
@@ -31,5 +34,6 @@ pub async fn handle(command: Command) -> Result<(), String> {
         Command::Run(args) => run::command(config, args).await,
         Command::Watch => watch::command().await,
         Command::Uninstall => uninstall::command().await,
+        Command::Info => info::command().await,
     }
 }
