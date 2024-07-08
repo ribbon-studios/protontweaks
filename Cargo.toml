@@ -3,7 +3,7 @@ name = "protontweaks"
 description = "Crowdsourced tweaks for Steam!"
 license = "MIT"
 authors = ["Cecilia Sanare <ceci@sanare.dev>"]
-version = "0.8.0"
+version = "0.8.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

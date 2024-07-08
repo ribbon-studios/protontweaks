@@ -60,7 +60,7 @@ jobs:
         run: cargo build -r --target ${{ matrix.target }} --locked
 
       - name: Install Cargo Tools
-        run: cargo install cargo-deb cargo-generate-rpm cargo-appimage
+        run: cargo install cargo-deb cargo-generate-rpm@0.14.1 cargo-appimage
 
       - name: Build Deb (linux)
         if: matrix.build == 'linux'
@@ -68,7 +68,7 @@ jobs:
 
       - name: Build RPM (linux)
         if: matrix.build == 'linux'
-        run: cargo generate-rpm -o protontweaks.rpm
+        run: cargo generate-rpm -o protontweaks.rpm --auto-req auto
 
       - name: Build AppImage (linux)
         if: matrix.build == 'linux'
