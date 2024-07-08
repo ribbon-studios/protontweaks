@@ -2,14 +2,14 @@ use owo_colors::OwoColorize;
 use protontweaks_api::{app::App, system::SystemTweaks};
 use std::{collections::HashMap, process::Command};
 
-use clap::Args;
+use clap::{Args, CommandFactory};
 use regex::Regex;
 
 use crate::{
     apps,
     config::Config,
     utils::{command, gamemode, mangohud},
-    API,
+    Cli, API,
 };
 
 #[derive(Debug, Args)]
@@ -19,6 +19,13 @@ pub struct CommandArgs {
 }
 
 pub async fn command(config: Config, args: CommandArgs) -> Result<(), String> {
+    if args.command_args.is_none() {
+        Cli::command()
+            .print_help()
+            .expect("Failed to output help information.");
+        return Ok(());
+    }
+
     let (command, args, app, system_tweaks) = parse_command(config, args).await?;
 
     if let Some(app) = &app {
@@ -120,7 +127,7 @@ async fn parse_command(
 pub mod tests {
     use crate::config::Config;
 
-    use super::{parse_command, CommandArgs};
+    use super::{command, parse_command, CommandArgs};
 
     #[tokio::test]
     pub async fn parse_command_should_support_simple_commands() {
@@ -140,6 +147,13 @@ pub mod tests {
             system_tweaks.is_none(),
             "Expected systemTweaks to not be defined!"
         );
+    }
+
+    #[tokio::test]
+    pub async fn command_should_support_no_args() {
+        command(Config::off(), CommandArgs { command_args: None })
+            .await
+            .expect("Failed to parse command.");
     }
 
     #[tokio::test]
