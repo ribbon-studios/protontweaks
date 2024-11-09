@@ -2,6 +2,7 @@ use clap::Subcommand;
 
 use crate::config::Config;
 
+pub mod edit;
 pub mod info;
 pub mod list;
 pub mod run;
@@ -23,6 +24,8 @@ pub enum Command {
     Uninstall,
     /// Outputs information about the system
     Info,
+    /// Quickly opens up a protontweak entry for editing
+    Edit(edit::CommandArgs),
 }
 
 pub async fn handle(command: Command) -> Result<(), String> {
@@ -35,5 +38,6 @@ pub async fn handle(command: Command) -> Result<(), String> {
         Command::Watch => watch::command().await,
         Command::Uninstall => uninstall::command().await,
         Command::Info => info::command().await,
+        Command::Edit(args) => edit::command(args).await,
     }
 }
