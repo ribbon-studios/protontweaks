@@ -30,6 +30,6 @@ rustPlatform.buildRustPackage {
     description = "Automatically apply necessary protontricks to your games!";
     homepage = "https://github.com/rain-cafe/protontweaks";
     license = licenses.mit;
-    maintainers = with maintainers; [ "cecilia-sanare" ];
+    maintainers = [ "cecilia-sanare" ];
   };
 }

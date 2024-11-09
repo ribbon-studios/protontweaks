@@ -18,13 +18,22 @@ pub struct CommandArgs {
     pub command_args: Option<Vec<String>>,
 }
 
-pub async fn command(config: Config, args: CommandArgs) -> Result<(), String> {
+pub async fn command(config: Config, mut args: CommandArgs) -> Result<(), String> {
     if args.command_args.is_none() {
         Cli::command()
             .print_help()
             .expect("Failed to output help information.");
         return Ok(());
     }
+
+    // Not a fan of this, but it fixes an issue on wayland where it utilizes '--' after the steam-launch-wrapper
+    // Without it games never start
+    args.command_args = Some(
+        std::env::args()
+            .into_iter()
+            .filter(|x| x != "cargo" && x != "protontweaks" && x != "run")
+            .collect::<Vec<String>>(),
+    );
 
     let (command, args, app, system_tweaks) = parse_command(config, args).await?;
 
